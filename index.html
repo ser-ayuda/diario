@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Diario Libro</title>
+    <style>
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --danger: #ef4444; }
+        /* Estética tipo "Papel/Libro" */
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--txt); margin: 0; padding: 20px; padding-bottom: 160px; }
+        
+        #auth { position: fixed; inset: 0; background: #0f172a; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        
+        /* Buscador */
+        .search-box { width: 100%; max-width: 500px; margin: 0 auto 20px; position: sticky; top: 10px; z-index: 10; }
+        .search-box input { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); outline: none; }
+
+        /* Estilo Libro */
+        .dia { background: var(--card); border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 5px solid var(--p); overflow: hidden; }
+        .dia-h { background: #f1f5f9; padding: 12px; font-weight: bold; font-family: sans-serif; color: var(--p); text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
+        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; line-height: 1.6; }
+        .hora { color: #94a3b8; font-size: 0.8em; font-family: sans-serif; display: block; margin-bottom: 5px; }
+
+        /* Botones */
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; text-align: center; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; }
+        .btn-mic { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4); }
+        .btn-export { background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-family: sans-serif; font-weight: bold; cursor: pointer; }
+        
+        .recording { background: var(--danger); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        input[type="password"] { background: #1e293b; border: 1px solid var(--p); color: white; padding: 15px; border-radius: 10px; width: 70%; text-align: center; font-size: 20px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div id="auth">
+        <h2>MI DIARIO PRIVADO</h2>
+        <input type="password" id="pin" placeholder="PIN">
+        <button onclick="login()" style="padding:10px 40px; border-radius:10px; background:var(--p); color:white; border:none;">ABRIR LIBRO</button>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="busqueda" placeholder="🔍 Buscar frase o palabra..." oninput="render()">
+    </div>
+
+    <div id="lista" style="max-width: 600px; margin: 0 auto;"></div>
+
+    <div class="panel">
+        <button class="btn-export" onclick="exportarDiario()">💾 EXPORTAR LIBRO</button>
+        <button id="btn" class="btn-mic">🎤</button>
+        <div id="st" style="font-size: 10px; color: #64748b;">Pulsa micro</div>
+    </div>
+
+    <script>
+        const PIN_CORRECTO = "1234"; 
+        let notas = JSON.parse(localStorage.getItem('diario_libro_v5')) || [];
+
+        function login() {
+            if(document.getElementById('pin').value === PIN_CORRECTO) {
+                document.getElementById('auth').style.display = 'none';
+                render();
+            } else { alert("PIN Incorrecto"); }
+        }
+
+        // --- SISTEMA DE VOZ ---
+        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (Speech) {
+            const rec = new Speech();
+            rec.lang = 'es-ES';
+            const btn = document.getElementById('btn');
+            
+            btn.onclick = () => { rec.start(); };
+            rec.onstart = () => { btn.classList.add('recording'); document.getElementById('st').innerText = "Grabando..."; };
+            rec.onresult = (e) => {
+                const txt = e.results[0][0].transcript;
+                const d = new Date();
+                notas.unshift({
+                    t: txt,
+                    h: d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+                    f: d.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}),
+                    rawDate: d
+                });
+                localStorage.setItem('diario_libro_v5', JSON.stringify(notas));
+                render();
+            };
+            rec.onend = () => { btn.classList.remove('recording'); document.getElementById('st').innerText = "Guardado"; };
+        }
+
+        // --- BUSCADOR Y RENDER ---
+        function render() {
+            const cont = document.getElementById('lista');
+            const term = document.getElementById('busqueda').value.toLowerCase();
+            
+            // Filtrar notas por el buscador
+            const notasFiltradas = notas.filter(n => n.t.toLowerCase().includes(term));
+
+            const grupos = notasFiltradas.reduce((acc, n) => {
+                if (!acc[n.f]) acc[n.f] = [];
+                acc[n.f].push(n);
+                return acc;
+            }, {});
+
+            cont.innerHTML = Object.keys(grupos).map(f => `
+                <div class="dia">
+                    <div class="dia-h">${f}</div>
+                    ${grupos[f].map(n => `<div class="nota"><span class="hora">${n.h}</span>${n.t}</div>`).join('')}
+                </div>
+            `).join('');
+        }
+
+        // --- FUNCIÓN EXPORTAR (LIBRO) ---
+        function exportarDiario() {
+            if (notas.length === 0) return alert("No hay notas para exportar");
+            
+            let contenido = "MI DIARIO PERSONAL\n" + "=".repeat(20) + "\n\n";
+            
+            // Agrupar para el documento
+            const grupos = notas.reduce((acc, n) => {
+                if (!acc[n.f]) acc[n.f] = [];
+                acc[n.f].push(n);
+                return acc;
+            }, {});
+
+            Object.keys(grupos).forEach(fecha => {
+                contenido += `--- ${fecha.toUpperCase()} ---\n`;
+                grupos[fecha].forEach(n => {
+                    contenido += `[${n.h}] ${n.t}\n`;
+                });
+                contenido += "\n";
+            });
+
+            const blob = new Blob([contenido], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "Mi_Libro_de_Notas.txt";
+            link.click();
+        }
+    </script>
+</body>
+</html>
