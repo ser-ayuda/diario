@@ -3,56 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Diario Libro</title>
+    <title>Editor de Diario Pro</title>
     <style>
-        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --danger: #ef4444; }
-        /* Estética tipo "Papel/Libro" */
-        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--txt); margin: 0; padding: 20px; padding-bottom: 160px; }
+        :root { --p: #6366f1; --bg: #f1f5f9; --card: #ffffff; --txt: #1e293b; }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; }
         
-        #auth { position: fixed; inset: 0; background: #0f172a; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
         
-        /* Buscador */
-        .search-box { width: 100%; max-width: 500px; margin: 0 auto 20px; position: sticky; top: 10px; z-index: 10; }
-        .search-box input { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); outline: none; }
+        /* Buscador y Filtros */
+        .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; }
+        .search-box input { width: 90%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; display: block; margin: 0 auto; }
+        
+        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding: 10px; scrollbar-width: none; }
+        .tag-pill { padding: 5px 15px; border-radius: 15px; background: white; border: 1px solid #ddd; font-size: 0.8em; white-space: nowrap; cursor: pointer; font-family: sans-serif; }
 
-        /* Estilo Libro */
-        .dia { background: var(--card); border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 5px solid var(--p); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 12px; font-weight: bold; font-family: sans-serif; color: var(--p); text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
-        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; line-height: 1.6; }
-        .hora { color: #94a3b8; font-size: 0.8em; font-family: sans-serif; display: block; margin-bottom: 5px; }
-
-        /* Botones */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; text-align: center; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; }
-        .btn-mic { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4); }
-        .btn-export { background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-family: sans-serif; font-weight: bold; cursor: pointer; }
+        /* Estilo Libro/Notas */
+        .dia { background: var(--card); border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+        .dia-h { background: #e2e8f0; padding: 10px; font-weight: bold; font-size: 0.8em; color: #475569; }
         
-        .recording { background: var(--danger); animation: pulse 1s infinite; }
+        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; position: relative; border-left: 8px solid transparent; transition: 0.3s; }
+        .nota-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .nota-titulo { font-weight: bold; font-family: sans-serif; color: var(--p); font-size: 0.9em; }
+        .nota-texto { line-height: 1.5; cursor: pointer; }
+        .hora { color: #94a3b8; font-size: 0.7em; }
+
+        /* Modal de Edición */
+        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1500; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; }
+        .modal-content textarea { width: 100%; height: 100px; margin: 10px 0; padding: 10px; box-sizing: border-box; }
+        .modal-content input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        .color-picker { display: flex; gap: 10px; margin: 10px 0; }
+        .color-opt { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+        .color-opt.selected { border-color: black; }
+
+        /* Panel Inferior */
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; border-top: 1px solid #ddd; display: flex; justify-content: space-around; align-items: center; }
+        .btn-mic { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; }
+        .recording { background: #ef4444; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        input[type="password"] { background: #1e293b; border: 1px solid var(--p); color: white; padding: 15px; border-radius: 10px; width: 70%; text-align: center; font-size: 20px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div id="auth">
-        <h2>MI DIARIO PRIVADO</h2>
-        <input type="password" id="pin" placeholder="PIN">
-        <button onclick="login()" style="padding:10px 40px; border-radius:10px; background:var(--p); color:white; border:none;">ABRIR LIBRO</button>
+        <h2>EDITOR DE DIARIO</h2>
+        <input type="password" id="pin" placeholder="PIN" style="padding:15px; border-radius:10px; text-align:center;">
+        <button onclick="login()" style="margin-top:20px; padding:10px 30px; background:var(--p); color:white; border:none; border-radius:8px;">ENTRAR</button>
     </div>
 
-    <div class="search-box">
-        <input type="text" id="busqueda" placeholder="🔍 Buscar frase o palabra..." oninput="render()">
+    <div class="header-controls">
+        <div class="search-box">
+            <input type="text" id="busqueda" placeholder="🔍 Buscar palabras o etiquetas..." oninput="render()">
+        </div>
+        <div class="tag-menu" id="tag-filters">
+            </div>
     </div>
 
-    <div id="lista" style="max-width: 600px; margin: 0 auto;"></div>
+    <div id="lista"></div>
+
+    <div id="editor-modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0">Editar Nota</h3>
+            <input type="text" id="edit-titulo" placeholder="Título o Sección (ej: Capítulo 1)">
+            <textarea id="edit-texto" placeholder="Contenido de la nota..."></textarea>
+            <p style="font-size: 0.8em; margin: 5px 0;">Color de Etiqueta:</p>
+            <div class="color-picker" id="color-selector">
+                <div class="color-opt" onclick="selCol('', this)" style="background:#ddd"></div>
+                <div class="color-opt" onclick="selCol('#6366f1', this)" style="background:#6366f1"></div>
+                <div class="color-opt" onclick="selCol('#10b981', this)" style="background:#10b981"></div>
+                <div class="color-opt" onclick="selCol('#f59e0b', this)" style="background:#f59e0b"></div>
+                <div class="color-opt" onclick="selCol('#ef4444', this)" style="background:#ef4444"></div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="saveEdit()" style="flex:1; padding:10px; background:var(--p); color:white; border:none; border-radius:5px;">Guardar</button>
+                <button onclick="closeModal()" style="flex:1; padding:10px; background:#ccc; border:none; border-radius:5px;">Cancelar</button>
+            </div>
+            <button onclick="deleteNote()" style="width:100%; margin-top:10px; background:none; color:red; border:none; font-size:0.8em;">Eliminar Nota</button>
+        </div>
+    </div>
 
     <div class="panel">
-        <button class="btn-export" onclick="exportarDiario()">💾 EXPORTAR LIBRO</button>
+        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:10px; border-radius:8px; font-size:0.7em;">EXPORTAR</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size: 10px; color: #64748b;">Pulsa micro</div>
+        <div id="st" style="font-size: 10px; color: #64748b;">Micro</div>
     </div>
 
     <script>
         const PIN_CORRECTO = "1234"; 
-        let notas = JSON.parse(localStorage.getItem('diario_libro_v5')) || [];
+        let notas = JSON.parse(localStorage.getItem('diario_v6')) || [];
+        let editId = null;
+        let selectedColor = "";
+        let filtroColor = "";
 
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
@@ -67,33 +107,84 @@
             const rec = new Speech();
             rec.lang = 'es-ES';
             const btn = document.getElementById('btn');
-            
-            btn.onclick = () => { rec.start(); };
-            rec.onstart = () => { btn.classList.add('recording'); document.getElementById('st').innerText = "Grabando..."; };
+            rec.onstart = () => btn.classList.add('recording');
+            rec.onend = () => btn.classList.remove('recording');
+            btn.onclick = () => rec.start();
             rec.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
                 const d = new Date();
                 notas.unshift({
+                    id: Date.now(),
                     t: txt,
+                    titulo: "",
+                    color: "",
                     h: d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                    f: d.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}),
-                    rawDate: d
+                    f: d.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'})
                 });
-                localStorage.setItem('diario_libro_v5', JSON.stringify(notas));
+                localStorage.setItem('diario_v6', JSON.stringify(notas));
                 render();
             };
-            rec.onend = () => { btn.classList.remove('recording'); document.getElementById('st').innerText = "Guardado"; };
         }
 
-        // --- BUSCADOR Y RENDER ---
+        // --- FUNCIONES DE EDICIÓN ---
+        function openEdit(id) {
+            editId = id;
+            const nota = notas.find(n => n.id === id);
+            document.getElementById('edit-titulo').value = nota.titulo || "";
+            document.getElementById('edit-texto').value = nota.t;
+            selectedColor = nota.color || "";
+            document.getElementById('editor-modal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
+
+        function selCol(color, el) {
+            selectedColor = color;
+            document.querySelectorAll('.color-opt').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function saveEdit() {
+            const idx = notas.findIndex(n => n.id === editId);
+            notas[idx].titulo = document.getElementById('edit-titulo').value;
+            notas[idx].t = document.getElementById('edit-texto').value;
+            notas[idx].color = selectedColor;
+            localStorage.setItem('diario_v6', JSON.stringify(notas));
+            closeModal();
+            render();
+        }
+
+        function deleteNote() {
+            if(confirm("¿Borrar esta nota?")) {
+                notas = notas.filter(n => n.id !== editId);
+                localStorage.setItem('diario_v6', JSON.stringify(notas));
+                closeModal();
+                render();
+            }
+        }
+
+        // --- RENDERIZADO Y FILTROS ---
+        function setFiltroColor(c) {
+            filtroColor = (filtroColor === c) ? "" : c;
+            render();
+        }
+
         function render() {
             const cont = document.getElementById('lista');
             const term = document.getElementById('busqueda').value.toLowerCase();
             
-            // Filtrar notas por el buscador
-            const notasFiltradas = notas.filter(n => n.t.toLowerCase().includes(term));
+            // Actualizar Filtros de Color en el menú superior
+            const colors = ["#6366f1", "#10b981", "#f59e0b", "#ef4444"];
+            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill" onclick="setFiltroColor('')" style="${filtroColor===''?'background:#ddd':''}">Todos</div>` + 
+                colors.map(c => `<div class="tag-pill" onclick="setFiltroColor('${c}')" style="border-bottom: 4px solid ${c}; ${filtroColor===c?'background:#eee':''}">Color</div>`).join('');
 
-            const grupos = notasFiltradas.reduce((acc, n) => {
+            const filtradas = notas.filter(n => {
+                const matchBusqueda = n.t.toLowerCase().includes(term) || (n.titulo && n.titulo.toLowerCase().includes(term));
+                const matchColor = filtroColor === "" || n.color === filtroColor;
+                return matchBusqueda && matchColor;
+            });
+
+            const grupos = filtradas.reduce((acc, n) => {
                 if (!acc[n.f]) acc[n.f] = [];
                 acc[n.f].push(n);
                 return acc;
@@ -102,37 +193,29 @@
             cont.innerHTML = Object.keys(grupos).map(f => `
                 <div class="dia">
                     <div class="dia-h">${f}</div>
-                    ${grupos[f].map(n => `<div class="nota"><span class="hora">${n.h}</span>${n.t}</div>`).join('')}
+                    ${grupos[f].map(n => `
+                        <div class="nota" style="border-left-color: ${n.color || 'transparent'}" onclick="openEdit(${n.id})">
+                            <div class="nota-header">
+                                <span class="nota-titulo">${n.titulo || ''}</span>
+                                <span class="hora">${n.h}</span>
+                            </div>
+                            <div class="nota-texto">${n.t}</div>
+                        </div>
+                    `).join('')}
                 </div>
             `).join('');
         }
 
-        // --- FUNCIÓN EXPORTAR (LIBRO) ---
-        function exportarDiario() {
-            if (notas.length === 0) return alert("No hay notas para exportar");
-            
-            let contenido = "MI DIARIO PERSONAL\n" + "=".repeat(20) + "\n\n";
-            
-            // Agrupar para el documento
-            const grupos = notas.reduce((acc, n) => {
-                if (!acc[n.f]) acc[n.f] = [];
-                acc[n.f].push(n);
-                return acc;
-            }, {});
-
-            Object.keys(grupos).forEach(fecha => {
-                contenido += `--- ${fecha.toUpperCase()} ---\n`;
-                grupos[fecha].forEach(n => {
-                    contenido += `[${n.h}] ${n.t}\n`;
-                });
-                contenido += "\n";
+        function exportarTodo() {
+            let txt = "MI LIBRO\n\n";
+            notas.forEach(n => {
+                txt += `${n.f} [${n.h}]\n${n.titulo ? 'SECCIÓN: ' + n.titulo + '\n' : ''}${n.t}\n\n`;
             });
-
-            const blob = new Blob([contenido], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = "Mi_Libro_de_Notas.txt";
-            link.click();
+            const blob = new Blob([txt], {type:'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "libro_completo.txt";
+            a.click();
         }
     </script>
 </body>
