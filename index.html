@@ -2,103 +2,80 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escritor Pro con Etiquetas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Escritor Pro</title>
     <style>
         :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; }
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; }
-        
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        
-        /* Cabecera y Filtros */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 5px; border-bottom: 1px solid #e2e8f0; }
         .search-box input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
-        
-        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .tag-pill { padding: 6px 14px; border-radius: 20px; background: white; border: 1px solid #ddd; font-size: 0.75em; white-space: nowrap; font-family: sans-serif; cursor: pointer; }
+        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .tag-pill { padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #ddd; font-size: 0.8em; white-space: nowrap; font-family: sans-serif; cursor: pointer; }
         .tag-pill.active { background: var(--p); color: white; border-color: var(--p); }
-
-        /* Estilo de Notas */
         .dia { background: var(--card); border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; font-family: sans-serif; border-bottom: 1px solid #e2e8f0; }
-        
-        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; border-left: 6px solid transparent; position: relative; }
-        .nota-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-        .nota-tag { font-size: 0.65em; padding: 2px 8px; border-radius: 4px; font-family: sans-serif; font-weight: bold; text-transform: uppercase; }
-        .hora { color: #94a3b8; font-size: 0.7em; font-family: sans-serif; }
-        .nota-texto { line-height: 1.6; font-size: 1.05em; }
-
-        /* Ventana de Edición (Modal) */
+        .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; font-family: sans-serif; }
+        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; border-left: 6px solid transparent; }
+        .nota-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .nota-tag { font-size: 0.7em; padding: 3px 10px; border-radius: 5px; font-family: sans-serif; font-weight: bold; }
+        .hora { color: #94a3b8; font-size: 0.75em; font-family: sans-serif; }
         #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 92%; max-width: 450px; padding: 20px; border-radius: 20px; max-height: 90vh; overflow-y: auto; }
-        textarea { width: 100%; height: 120px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: 'Georgia', serif; font-size: 16px; box-sizing: border-box; }
-        
-        /* Selector de Etiquetas Estilo Colores */
+        .modal-content { background: white; width: 90%; max-width: 450px; padding: 20px; border-radius: 20px; }
+        textarea { width: 100%; height: 120px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: serif; font-size: 16px; box-sizing: border-box; }
         .tag-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
-        .tag-opt { padding: 10px; border-radius: 8px; border: 2px solid #eee; cursor: pointer; font-size: 0.8em; font-family: sans-serif; text-align: center; font-weight: bold; transition: 0.2s; }
-        .tag-opt.selected { border-color: #334155; transform: scale(1.02); }
-
-        /* Panel Inferior */
+        .tag-opt { padding: 12px; border-radius: 10px; border: 2px solid #f1f5f9; cursor: pointer; font-family: sans-serif; text-align: center; font-size: 0.85em; font-weight: bold; }
+        .tag-opt.selected { border-color: #334155; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .btn-mic { width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 28px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+        .btn-mic { width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 28px; }
         .recording { background: #ef4444; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .btn-exp { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; font-family: sans-serif; }
     </style>
 </head>
 <body>
     <div id="auth">
-        <h2 style="letter-spacing: 2px;">MI LIBRO PRIVADO</h2>
-        <input type="password" id="pin" placeholder="PIN de acceso" style="padding:15px; border-radius:12px; border:none; text-align:center; font-size:20px;">
-        <button onclick="login()" style="margin-top:25px; padding:12px 50px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">ABRIR</button>
+        <h2>MI LIBRO</h2>
+        <input type="password" id="pin" placeholder="PIN" style="padding:15px; border-radius:10px; text-align:center;">
+        <button onclick="login()" style="margin-top:20px; padding:12px 40px; background:var(--p); color:white; border:none; border-radius:10px;">ENTRAR</button>
     </div>
 
     <div class="header-controls">
-        <div class="search-box">
-            <input type="text" id="busqueda" placeholder="🔍 Buscar palabras o secciones..." oninput="render()">
-        </div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar..." oninput="render()"></div>
         <div class="tag-menu" id="tag-filters"></div>
     </div>
 
-    <div id="lista" style="max-width: 600px; margin: 0 auto;"></div>
+    <div id="lista"></div>
 
     <div id="editor-modal">
         <div class="modal-content">
-            <h3 style="margin-top:0; font-family:sans-serif;">Organizar Nota</h3>
+            <h3 style="margin:0">Editar Nota</h3>
             <textarea id="edit-texto"></textarea>
-            
-            <p style="font-size: 0.8em; font-family:sans-serif; margin-bottom:10px; color:#64748b;">Selecciona una Etiqueta/Sección:</p>
-            <div class="tag-selector" id="tag-options">
-                </div>
-
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button onclick="saveEdit()" style="flex:2; padding:15px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">GUARDAR</button>
-                <button onclick="closeModal()" style="flex:1; padding:15px; background:#f1f5f9; border:none; border-radius:12px; color:#64748b;">Cerrar</button>
+            <div class="tag-selector" id="tag-options"></div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveEdit()" style="flex:2; padding:15px; background:var(--p); color:white; border:none; border-radius:10px; font-weight:bold;">GUARDAR</button>
+                <button onclick="closeModal()" style="flex:1; padding:15px; background:#f1f5f9; border:none; border-radius:10px;">Cerrar</button>
             </div>
-            <button onclick="deleteNote()" style="width:100%; margin-top:20px; background:none; color:#94a3b8; border:none; font-size:0.8em;">Eliminar esta nota permanentemente</button>
+            <button onclick="deleteNote()" style="width:100%; margin-top:20px; background:none; color:#94a3b8; border:none; font-size:0.8em;">Eliminar nota</button>
         </div>
     </div>
 
     <div class="panel">
-        <button class="btn-exp" onclick="exportarTodo()">💾 LIBRO</button>
+        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold;">EXPORTAR</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div style="text-align:right"><small id="st" style="color:#94a3b8">Listo</small></div>
+        <div id="st" style="font-size: 10px; color: #94a3b8;">Listo</div>
     </div>
 
     <script>
         const PIN_CORRECTO = "1234";
-        // Definición de tus etiquetas personalizadas
         const MIS_ETIQUETAS = [
             { id: 't1', nombre: 'Capítulo 1', color: '#6366f1' },
             { id: 't2', nombre: 'Personajes', color: '#10b981' },
-            { id: 't3', nombre: 'Ideas Sueltas', color: '#f59e0b' },
-            { id: 't4', nombre: 'Corregir', color: '#ef4444' },
-            { id: 't5', nombre: 'Finalizado', color: '#8b5cf6' }
+            { id: 't3', nombre: 'Ideas', color: '#f59e0b' },
+            { id: 't4', nombre: 'Corregir', color: '#ef4444' }
         ];
 
-        let notas = JSON.parse(localStorage.getItem('diario_libro_v7')) || [];
+        let notas = JSON.parse(localStorage.getItem('diario_v8')) || [];
         let editId = null;
-        let selectedTagId = null;
+        let tempTagId = null;
         let filtroTag = "";
 
         function login() {
@@ -108,133 +85,14 @@
             } else { alert("PIN incorrecto"); }
         }
 
-        // --- VOZ ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'es-ES';
             const btn = document.getElementById('btn');
-            rec.onstart = () => { btn.classList.add('recording'); document.getElementById('st').innerText = "Oigo..."; };
-            rec.onend = () => { btn.classList.remove('recording'); document.getElementById('st').innerText = "Guardado"; };
+            rec.onstart = () => btn.classList.add('recording');
+            rec.onend = () => btn.classList.remove('recording');
             btn.onclick = () => rec.start();
             rec.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
-                const d = new Date();
-                notas.unshift({
-                    id: Date.now(),
-                    t: txt,
-                    tagId: null,
-                    h: d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                    f: d.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'})
-                });
-                localStorage.setItem('diario_libro_v7', JSON.stringify(notas));
-                render();
-            };
-        }
-
-        // --- EDICIÓN Y ETIQUETAS ---
-        function openEdit(id) {
-            editId = id;
-            const nota = notas.find(n => n.id === id);
-            document.getElementById('edit-texto').value = nota.t;
-            selectedTagId = nota.tagId;
-            
-            // Generar opciones de etiquetas en el modal
-            const container = document.getElementById('tag-options');
-            container.innerHTML = MIS_ETIQUETAS.map(tag => `
-                <div class="tag-opt ${selectedTagId === tag.id ? 'selected' : ''}" 
-                     style="background: ${tag.color}20; color: ${tag.color}; border-color: ${selectedTagId === tag.id ? tag.color : '#eee'}"
-                     onclick="selectTag('${tag.id}')">
-                    ${tag.nombre}
-                </div>
-            `).join('') + `<div class="tag-opt ${!selectedTagId ? 'selected' : ''}" onclick="selectTag(null)">Ninguna</div>`;
-            
-            document.getElementById('editor-modal').style.display = 'flex';
-        }
-
-        function selectTag(id) {
-            selectedTagId = id;
-            openEdit(editId); // Refresca la selección visual
-        }
-
-        function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
-
-        function saveEdit() {
-            const idx = notas.findIndex(n => n.id === editId);
-            notas[idx].t = document.getElementById('edit-texto').value;
-            notas[idx].tagId = selectedTagId;
-            localStorage.setItem('diario_libro_v7', JSON.stringify(notas));
-            closeModal();
-            render();
-        }
-
-        function deleteNote() {
-            if(confirm("¿Seguro que quieres borrar esta nota?")) {
-                notas = notas.filter(n => n.id !== editId);
-                localStorage.setItem('diario_libro_v7', JSON.stringify(notas));
-                closeModal();
-                render();
-            }
-        }
-
-        // --- RENDERIZADO ---
-        function filtrar(tagId) {
-            filtroTag = (filtroTag === tagId) ? "" : tagId;
-            render();
-        }
-
-        function render() {
-            const cont = document.getElementById('lista');
-            const term = document.getElementById('busqueda').value.toLowerCase();
-            
-            // Render Filtros Superiores
-            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill ${filtroTag===''?'active':''}" onclick="filtrar('')">Todo</div>` + 
-                MIS_ETIQUETAS.map(t => `<div class="tag-pill ${filtroTag===t.id?'active':''}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
-
-            const filtradas = notas.filter(n => {
-                const matchTag = filtroTag === "" || n.tagId === filtroTag;
-                const matchBus = n.t.toLowerCase().includes(term);
-                return matchTag && matchBus;
-            });
-
-            const grupos = filtradas.reduce((acc, n) => {
-                if (!acc[n.f]) acc[n.f] = [];
-                acc[n.f].push(n);
-                return acc;
-            }, {});
-
-            cont.innerHTML = Object.keys(grupos).map(f => `
-                <div class="dia">
-                    <div class="dia-h">${f.toUpperCase()}</div>
-                    ${grupos[f].map(n => {
-                        const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
-                        return `
-                        <div class="nota" style="border-left-color: ${tag ? tag.color : 'transparent'}" onclick="openEdit(${n.id})">
-                            <div class="nota-header">
-                                ${tag ? `<span class="nota-tag" style="background:${tag.color}20; color:${tag.color}">${tag.nombre}</span>` : '<span></span>'}
-                                <span class="hora">${n.h}</span>
-                            </div>
-                            <div class="nota-texto">${n.t}</div>
-                        </div>`;
-                    }).join('')}
-                </div>
-            `).join('');
-        }
-
-        function exportarTodo() {
-            let out = "MI LIBRO PERSONAL\n==================\n\n";
-            notas.forEach(n => {
-                const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
-                out += `FECHA: ${n.f} [${n.h}]\n`;
-                if(tag) out += `SECCIÓN: ${tag.nombre}\n`;
-                out += `TEXTO: ${n.t}\n\n------------------\n\n`;
-            });
-            const blob = new Blob([out], {type:'text/plain'});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = "libro_de_notas.txt";
-            link.click();
-        }
-    </script>
-</body>
-</html>
+                notas.unshift({ id: Date.now(), t: txt, tagId: null, h: new Date().toLocaleTimeString([], {
