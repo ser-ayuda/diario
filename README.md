@@ -50,3 +50,44 @@ Para convertir tus notas en un libro real o cambiar de dispositivo:
 
 ---
 *Desarrollado para convertir pensamientos en palabras de forma segura.* ✍️🎙️
+# Escritor Pro - Versión Creative Focus (v6.4) 🖋️🎙️⌚
+
+Escritor Pro es una aplicación web de dictado profesional diseñada específicamente para autores. Combina una solución técnica de alto nivel para el reconocimiento de voz con un entorno diseñado para la inspiración y el enfoque creativo.
+
+## 🚀 Características Principales
+
+### 🧠 Entorno de Enfoque e Inspiración (Nuevo)
+- **Dashboard de Bienvenida:** Pantalla de acceso ergonómica situada en la zona superior para facilitar el uso con teclados virtuales.
+- **Reloj en Tiempo Real:** Visualización de la hora exacta para el control de sesiones de escritura creativa.
+- **Calendario en Español:** Fecha actual en formato largo (ej. "sábado, 20 de diciembre de 2025").
+- **Motor de Motivación:** Incluye más de 50 frases célebres y refranes sobre el oficio de escribir que rotan aleatoriamente para vencer el "bloqueo de la página en blanco".
+
+### 🛠️ Soluciones Técnicas Avanzadas
+- **Gestión de Latencia Híbrida:** - **Windows:** Implementa un sistema de "Pre-warming" (1.2s) con feedback visual para asegurar que el hardware esté activo antes de capturar la voz, evitando la pérdida de las primeras palabras.
+    - **Android:** Grabación instantánea optimizada para movilidad.
+- **Smart Silence Detection:** Guardado automático de fragmentos tras 4 segundos de silencio, permitiendo un dictado fluido sin intervención manual.
+- **Arquitectura "Recents-First":** Las notas más recientes aparecen siempre en la parte superior del feed inmediatamente después de grabar.
+
+### 🗂️ Organización y Edición
+- **Sistema de Etiquetas:** Clasificación por colores (Capítulo, Personaje, Idea, Revisar).
+- **Gestión de Notas:** Funciones completas para editar contenido o eliminar fragmentos de forma definitiva.
+- **Exportación Directa:** Descarga del manuscrito completo en formato `.txt` con marcas de tiempo.
+
+## 🛡️ Seguridad y Privacidad
+- **Acceso Protegido:** Barrera de seguridad mediante PIN de acceso personalizable.
+- **Privacidad Local (Zero-Cloud):** Los datos se almacenan exclusivamente en el `localStorage` del navegador. Tu manuscrito nunca viaja a servidores externos.
+- **Aislamiento de Datos:** La visualización y exportación de datos están estrictamente bloqueadas hasta que se valida el PIN.
+
+## 💻 Tecnologías Utilizadas
+- **Lenguajes:** HTML5, CSS3, JavaScript Vanilla.
+- **API:** Web Speech API (Reconocimiento de voz).
+- **Almacenamiento:** Browser LocalStorage.
+
+## 📦 Instalación
+1. Descarga el archivo `index.html`.
+2. Ábrelo en cualquier navegador moderno (optimizado para Chrome).
+3. Configura tu PIN en el código fuente (por defecto: `1234`).
+4. ¡Empieza a crear tu historia!
+
+---
+*Desarrollado con enfoque en la experiencia de usuario (UX) y la eficiencia del hardware.*
