@@ -95,4 +95,95 @@
             btn.onclick = () => rec.start();
             rec.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
-                notas.unshift({ id: Date.now(), t: txt, tagId: null, h: new Date().toLocaleTimeString([], {
+                notas.unshift({ id: Date.now(), t: txt, tagId: null, h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), f: new Date().toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}) });
+                localStorage.setItem('diario_v8', JSON.stringify(notas));
+                render();
+            };
+        }
+
+        function openEdit(id) {
+            editId = id;
+            const nota = notas.find(n => n.id === id);
+            document.getElementById('edit-texto').value = nota.t;
+            tempTagId = nota.tagId;
+            renderTagOptions();
+            document.getElementById('editor-modal').style.display = 'flex';
+        }
+
+        function renderTagOptions() {
+            const container = document.getElementById('tag-options');
+            container.innerHTML = MIS_ETIQUETAS.map(tag => `
+                <div class="tag-opt ${tempTagId === tag.id ? 'selected' : ''}" 
+                     style="background: ${tag.color}15; color: ${tag.color};"
+                     onclick="setTempTag('${tag.id}')">${tag.nombre}</div>
+            `).join('') + `<div class="tag-opt ${!tempTagId ? 'selected' : ''}" onclick="setTempTag(null)">Ninguna</div>`;
+        }
+
+        function setTempTag(id) {
+            tempTagId = id;
+            renderTagOptions();
+        }
+
+        function saveEdit() {
+            const idx = notas.findIndex(n => n.id === editId);
+            notas[idx].t = document.getElementById('edit-texto').value;
+            notas[idx].tagId = tempTagId;
+            localStorage.setItem('diario_v8', JSON.stringify(notas));
+            closeModal();
+            render();
+        }
+
+        function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
+
+        function deleteNote() {
+            if(confirm("¿Borrar?")) {
+                notas = notas.filter(n => n.id !== editId);
+                localStorage.setItem('diario_v8', JSON.stringify(notas));
+                closeModal();
+                render();
+            }
+        }
+
+        function filtrar(id) { filtroTag = (filtroTag === id) ? "" : id; render(); }
+
+        function render() {
+            const cont = document.getElementById('lista');
+            const term = document.getElementById('busqueda').value.toLowerCase();
+            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill ${filtroTag===''?'active':''}" onclick="filtrar('')">Todo</div>` + 
+                MIS_ETIQUETAS.map(t => `<div class="tag-pill ${filtroTag===t.id?'active':''}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
+
+            const filtradas = notas.filter(n => (filtroTag === "" || n.tagId === filtroTag) && n.t.toLowerCase().includes(term));
+            const grupos = filtradas.reduce((acc, n) => { if (!acc[n.f]) acc[n.f] = []; acc[n.f].push(n); return acc; }, {});
+
+            cont.innerHTML = Object.keys(grupos).map(f => `
+                <div class="dia">
+                    <div class="dia-h">${f.toUpperCase()}</div>
+                    ${grupos[f].map(n => {
+                        const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
+                        return `<div class="nota" style="border-left-color:${tag?tag.color:'transparent'}" onclick="openEdit(${n.id})">
+                            <div class="nota-header">
+                                ${tag?`<span class="nota-tag" style="background:${tag.color}15;color:${tag.color}">${tag.nombre}</span>`:'<span></span>'}
+                                <span class="hora">${n.h}</span>
+                            </div>
+                            <div style="line-height:1.6">${n.t}</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            `).join('');
+        }
+
+        function exportarTodo() {
+            let out = "MI LIBRO\n\n";
+            notas.forEach(n => {
+                const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
+                out += `${n.f} [${n.h}] ${tag?'('+tag.nombre+')':''}\n${n.t}\n\n`;
+            });
+            const blob = new Blob([out], {type:'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "libro.txt";
+            a.click();
+        }
+    </script>
+</body>
+</html>
