@@ -3,112 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Diario Pro</title>
+    <title>Escritor Pro con Etiquetas</title>
     <style>
-        :root { --p: #6366f1; --bg: #f1f5f9; --card: #ffffff; --txt: #1e293b; }
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; }
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; }
         
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
         
-        /* Buscador y Filtros */
-        .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; }
-        .search-box input { width: 90%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; display: block; margin: 0 auto; }
+        /* Cabecera y Filtros */
+        .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 5px; border-bottom: 1px solid #e2e8f0; }
+        .search-box input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
         
-        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding: 10px; scrollbar-width: none; }
-        .tag-pill { padding: 5px 15px; border-radius: 15px; background: white; border: 1px solid #ddd; font-size: 0.8em; white-space: nowrap; cursor: pointer; font-family: sans-serif; }
+        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .tag-pill { padding: 6px 14px; border-radius: 20px; background: white; border: 1px solid #ddd; font-size: 0.75em; white-space: nowrap; font-family: sans-serif; cursor: pointer; }
+        .tag-pill.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* Estilo Libro/Notas */
-        .dia { background: var(--card); border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
-        .dia-h { background: #e2e8f0; padding: 10px; font-weight: bold; font-size: 0.8em; color: #475569; }
+        /* Estilo de Notas */
+        .dia { background: var(--card); border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
+        .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; font-family: sans-serif; border-bottom: 1px solid #e2e8f0; }
         
-        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; position: relative; border-left: 8px solid transparent; transition: 0.3s; }
-        .nota-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .nota-titulo { font-weight: bold; font-family: sans-serif; color: var(--p); font-size: 0.9em; }
-        .nota-texto { line-height: 1.5; cursor: pointer; }
-        .hora { color: #94a3b8; font-size: 0.7em; }
+        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; border-left: 6px solid transparent; position: relative; }
+        .nota-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .nota-tag { font-size: 0.65em; padding: 2px 8px; border-radius: 4px; font-family: sans-serif; font-weight: bold; text-transform: uppercase; }
+        .hora { color: #94a3b8; font-size: 0.7em; font-family: sans-serif; }
+        .nota-texto { line-height: 1.6; font-size: 1.05em; }
 
-        /* Modal de Edición */
-        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1500; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; }
-        .modal-content textarea { width: 100%; height: 100px; margin: 10px 0; padding: 10px; box-sizing: border-box; }
-        .modal-content input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
-        .color-picker { display: flex; gap: 10px; margin: 10px 0; }
-        .color-opt { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
-        .color-opt.selected { border-color: black; }
+        /* Ventana de Edición (Modal) */
+        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 92%; max-width: 450px; padding: 20px; border-radius: 20px; max-height: 90vh; overflow-y: auto; }
+        textarea { width: 100%; height: 120px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: 'Georgia', serif; font-size: 16px; box-sizing: border-box; }
+        
+        /* Selector de Etiquetas Estilo Colores */
+        .tag-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
+        .tag-opt { padding: 10px; border-radius: 8px; border: 2px solid #eee; cursor: pointer; font-size: 0.8em; font-family: sans-serif; text-align: center; font-weight: bold; transition: 0.2s; }
+        .tag-opt.selected { border-color: #334155; transform: scale(1.02); }
 
         /* Panel Inferior */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; border-top: 1px solid #ddd; display: flex; justify-content: space-around; align-items: center; }
-        .btn-mic { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 24px; }
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-mic { width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 28px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
         .recording { background: #ef4444; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .btn-exp { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; font-family: sans-serif; }
     </style>
 </head>
 <body>
     <div id="auth">
-        <h2>EDITOR DE DIARIO</h2>
-        <input type="password" id="pin" placeholder="PIN" style="padding:15px; border-radius:10px; text-align:center;">
-        <button onclick="login()" style="margin-top:20px; padding:10px 30px; background:var(--p); color:white; border:none; border-radius:8px;">ENTRAR</button>
+        <h2 style="letter-spacing: 2px;">MI LIBRO PRIVADO</h2>
+        <input type="password" id="pin" placeholder="PIN de acceso" style="padding:15px; border-radius:12px; border:none; text-align:center; font-size:20px;">
+        <button onclick="login()" style="margin-top:25px; padding:12px 50px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">ABRIR</button>
     </div>
 
     <div class="header-controls">
         <div class="search-box">
-            <input type="text" id="busqueda" placeholder="🔍 Buscar palabras o etiquetas..." oninput="render()">
+            <input type="text" id="busqueda" placeholder="🔍 Buscar palabras o secciones..." oninput="render()">
         </div>
-        <div class="tag-menu" id="tag-filters">
-            </div>
+        <div class="tag-menu" id="tag-filters"></div>
     </div>
 
-    <div id="lista"></div>
+    <div id="lista" style="max-width: 600px; margin: 0 auto;"></div>
 
     <div id="editor-modal">
         <div class="modal-content">
-            <h3 style="margin-top:0">Editar Nota</h3>
-            <input type="text" id="edit-titulo" placeholder="Título o Sección (ej: Capítulo 1)">
-            <textarea id="edit-texto" placeholder="Contenido de la nota..."></textarea>
-            <p style="font-size: 0.8em; margin: 5px 0;">Color de Etiqueta:</p>
-            <div class="color-picker" id="color-selector">
-                <div class="color-opt" onclick="selCol('', this)" style="background:#ddd"></div>
-                <div class="color-opt" onclick="selCol('#6366f1', this)" style="background:#6366f1"></div>
-                <div class="color-opt" onclick="selCol('#10b981', this)" style="background:#10b981"></div>
-                <div class="color-opt" onclick="selCol('#f59e0b', this)" style="background:#f59e0b"></div>
-                <div class="color-opt" onclick="selCol('#ef4444', this)" style="background:#ef4444"></div>
-            </div>
+            <h3 style="margin-top:0; font-family:sans-serif;">Organizar Nota</h3>
+            <textarea id="edit-texto"></textarea>
+            
+            <p style="font-size: 0.8em; font-family:sans-serif; margin-bottom:10px; color:#64748b;">Selecciona una Etiqueta/Sección:</p>
+            <div class="tag-selector" id="tag-options">
+                </div>
+
             <div style="display:flex; gap:10px; margin-top:20px;">
-                <button onclick="saveEdit()" style="flex:1; padding:10px; background:var(--p); color:white; border:none; border-radius:5px;">Guardar</button>
-                <button onclick="closeModal()" style="flex:1; padding:10px; background:#ccc; border:none; border-radius:5px;">Cancelar</button>
+                <button onclick="saveEdit()" style="flex:2; padding:15px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">GUARDAR</button>
+                <button onclick="closeModal()" style="flex:1; padding:15px; background:#f1f5f9; border:none; border-radius:12px; color:#64748b;">Cerrar</button>
             </div>
-            <button onclick="deleteNote()" style="width:100%; margin-top:10px; background:none; color:red; border:none; font-size:0.8em;">Eliminar Nota</button>
+            <button onclick="deleteNote()" style="width:100%; margin-top:20px; background:none; color:#94a3b8; border:none; font-size:0.8em;">Eliminar esta nota permanentemente</button>
         </div>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:10px; border-radius:8px; font-size:0.7em;">EXPORTAR</button>
+        <button class="btn-exp" onclick="exportarTodo()">💾 LIBRO</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size: 10px; color: #64748b;">Micro</div>
+        <div style="text-align:right"><small id="st" style="color:#94a3b8">Listo</small></div>
     </div>
 
     <script>
-        const PIN_CORRECTO = "1234"; 
-        let notas = JSON.parse(localStorage.getItem('diario_v6')) || [];
+        const PIN_CORRECTO = "1234";
+        // Definición de tus etiquetas personalizadas
+        const MIS_ETIQUETAS = [
+            { id: 't1', nombre: 'Capítulo 1', color: '#6366f1' },
+            { id: 't2', nombre: 'Personajes', color: '#10b981' },
+            { id: 't3', nombre: 'Ideas Sueltas', color: '#f59e0b' },
+            { id: 't4', nombre: 'Corregir', color: '#ef4444' },
+            { id: 't5', nombre: 'Finalizado', color: '#8b5cf6' }
+        ];
+
+        let notas = JSON.parse(localStorage.getItem('diario_libro_v7')) || [];
         let editId = null;
-        let selectedColor = "";
-        let filtroColor = "";
+        let selectedTagId = null;
+        let filtroTag = "";
 
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
                 render();
-            } else { alert("PIN Incorrecto"); }
+            } else { alert("PIN incorrecto"); }
         }
 
-        // --- SISTEMA DE VOZ ---
+        // --- VOZ ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'es-ES';
             const btn = document.getElementById('btn');
-            rec.onstart = () => btn.classList.add('recording');
-            rec.onend = () => btn.classList.remove('recording');
+            rec.onstart = () => { btn.classList.add('recording'); document.getElementById('st').innerText = "Oigo..."; };
+            rec.onend = () => { btn.classList.remove('recording'); document.getElementById('st').innerText = "Guardado"; };
             btn.onclick = () => rec.start();
             rec.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
@@ -116,56 +123,63 @@
                 notas.unshift({
                     id: Date.now(),
                     t: txt,
-                    titulo: "",
-                    color: "",
+                    tagId: null,
                     h: d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                     f: d.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'})
                 });
-                localStorage.setItem('diario_v6', JSON.stringify(notas));
+                localStorage.setItem('diario_libro_v7', JSON.stringify(notas));
                 render();
             };
         }
 
-        // --- FUNCIONES DE EDICIÓN ---
+        // --- EDICIÓN Y ETIQUETAS ---
         function openEdit(id) {
             editId = id;
             const nota = notas.find(n => n.id === id);
-            document.getElementById('edit-titulo').value = nota.titulo || "";
             document.getElementById('edit-texto').value = nota.t;
-            selectedColor = nota.color || "";
+            selectedTagId = nota.tagId;
+            
+            // Generar opciones de etiquetas en el modal
+            const container = document.getElementById('tag-options');
+            container.innerHTML = MIS_ETIQUETAS.map(tag => `
+                <div class="tag-opt ${selectedTagId === tag.id ? 'selected' : ''}" 
+                     style="background: ${tag.color}20; color: ${tag.color}; border-color: ${selectedTagId === tag.id ? tag.color : '#eee'}"
+                     onclick="selectTag('${tag.id}')">
+                    ${tag.nombre}
+                </div>
+            `).join('') + `<div class="tag-opt ${!selectedTagId ? 'selected' : ''}" onclick="selectTag(null)">Ninguna</div>`;
+            
             document.getElementById('editor-modal').style.display = 'flex';
+        }
+
+        function selectTag(id) {
+            selectedTagId = id;
+            openEdit(editId); // Refresca la selección visual
         }
 
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
 
-        function selCol(color, el) {
-            selectedColor = color;
-            document.querySelectorAll('.color-opt').forEach(opt => opt.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
         function saveEdit() {
             const idx = notas.findIndex(n => n.id === editId);
-            notas[idx].titulo = document.getElementById('edit-titulo').value;
             notas[idx].t = document.getElementById('edit-texto').value;
-            notas[idx].color = selectedColor;
-            localStorage.setItem('diario_v6', JSON.stringify(notas));
+            notas[idx].tagId = selectedTagId;
+            localStorage.setItem('diario_libro_v7', JSON.stringify(notas));
             closeModal();
             render();
         }
 
         function deleteNote() {
-            if(confirm("¿Borrar esta nota?")) {
+            if(confirm("¿Seguro que quieres borrar esta nota?")) {
                 notas = notas.filter(n => n.id !== editId);
-                localStorage.setItem('diario_v6', JSON.stringify(notas));
+                localStorage.setItem('diario_libro_v7', JSON.stringify(notas));
                 closeModal();
                 render();
             }
         }
 
-        // --- RENDERIZADO Y FILTROS ---
-        function setFiltroColor(c) {
-            filtroColor = (filtroColor === c) ? "" : c;
+        // --- RENDERIZADO ---
+        function filtrar(tagId) {
+            filtroTag = (filtroTag === tagId) ? "" : tagId;
             render();
         }
 
@@ -173,15 +187,14 @@
             const cont = document.getElementById('lista');
             const term = document.getElementById('busqueda').value.toLowerCase();
             
-            // Actualizar Filtros de Color en el menú superior
-            const colors = ["#6366f1", "#10b981", "#f59e0b", "#ef4444"];
-            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill" onclick="setFiltroColor('')" style="${filtroColor===''?'background:#ddd':''}">Todos</div>` + 
-                colors.map(c => `<div class="tag-pill" onclick="setFiltroColor('${c}')" style="border-bottom: 4px solid ${c}; ${filtroColor===c?'background:#eee':''}">Color</div>`).join('');
+            // Render Filtros Superiores
+            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill ${filtroTag===''?'active':''}" onclick="filtrar('')">Todo</div>` + 
+                MIS_ETIQUETAS.map(t => `<div class="tag-pill ${filtroTag===t.id?'active':''}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
 
             const filtradas = notas.filter(n => {
-                const matchBusqueda = n.t.toLowerCase().includes(term) || (n.titulo && n.titulo.toLowerCase().includes(term));
-                const matchColor = filtroColor === "" || n.color === filtroColor;
-                return matchBusqueda && matchColor;
+                const matchTag = filtroTag === "" || n.tagId === filtroTag;
+                const matchBus = n.t.toLowerCase().includes(term);
+                return matchTag && matchBus;
             });
 
             const grupos = filtradas.reduce((acc, n) => {
@@ -192,30 +205,35 @@
 
             cont.innerHTML = Object.keys(grupos).map(f => `
                 <div class="dia">
-                    <div class="dia-h">${f}</div>
-                    ${grupos[f].map(n => `
-                        <div class="nota" style="border-left-color: ${n.color || 'transparent'}" onclick="openEdit(${n.id})">
+                    <div class="dia-h">${f.toUpperCase()}</div>
+                    ${grupos[f].map(n => {
+                        const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
+                        return `
+                        <div class="nota" style="border-left-color: ${tag ? tag.color : 'transparent'}" onclick="openEdit(${n.id})">
                             <div class="nota-header">
-                                <span class="nota-titulo">${n.titulo || ''}</span>
+                                ${tag ? `<span class="nota-tag" style="background:${tag.color}20; color:${tag.color}">${tag.nombre}</span>` : '<span></span>'}
                                 <span class="hora">${n.h}</span>
                             </div>
                             <div class="nota-texto">${n.t}</div>
-                        </div>
-                    `).join('')}
+                        </div>`;
+                    }).join('')}
                 </div>
             `).join('');
         }
 
         function exportarTodo() {
-            let txt = "MI LIBRO\n\n";
+            let out = "MI LIBRO PERSONAL\n==================\n\n";
             notas.forEach(n => {
-                txt += `${n.f} [${n.h}]\n${n.titulo ? 'SECCIÓN: ' + n.titulo + '\n' : ''}${n.t}\n\n`;
+                const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
+                out += `FECHA: ${n.f} [${n.h}]\n`;
+                if(tag) out += `SECCIÓN: ${tag.nombre}\n`;
+                out += `TEXTO: ${n.t}\n\n------------------\n\n`;
             });
-            const blob = new Blob([txt], {type:'text/plain'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "libro_completo.txt";
-            a.click();
+            const blob = new Blob([out], {type:'text/plain'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "libro_de_notas.txt";
+            link.click();
         }
     </script>
 </body>
