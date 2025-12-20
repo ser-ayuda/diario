@@ -3,98 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v6.2</title>
+    <title>Escritor Pro | v6.4</title>
     <style>
-        :root { 
-            --p: #6366f1; 
-            --bg: #f8fafc; 
-            --card: #ffffff; 
-            --txt: #1e293b; 
-            --accent: #ef4444; 
-            --wait: #f59e0b; 
-        }
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; --wait: #f59e0b; }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
-            color: var(--txt); 
-            margin: 0; 
-            padding: 10px; 
-            padding-bottom: 160px; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; 
         }
         
-        /* PANTALLA DE SEGURIDAD (PIN) - AJUSTADA ARRIBA */
+        /* PANTALLA DE ACCESO */
         #auth { 
-            position: fixed; 
-            inset: 0; 
-            background: #0f172a; 
-            z-index: 2000; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start; 
-            align-items: center; 
-            color: white; 
-            padding-top: 60px; /* Posicionado en la zona alta */
+            position: fixed; inset: 0; background: #0f172a; z-index: 2000; 
+            display: flex; flex-direction: column; justify-content: flex-start; 
+            align-items: center; color: white; padding-top: 40px; 
         }
 
-        #auth h2 {
-            margin-bottom: 30px;
-            font-size: 24px;
-            letter-spacing: 3px;
-            color: #818cf8;
-            font-weight: 800;
+        #fecha-actual {
+            font-size: 0.85em; color: #818cf8; margin-bottom: 5px; font-weight: bold;
+            text-transform: capitalize;
         }
+
+        #hora-actual {
+            font-size: 2em; color: #fff; font-weight: 200; margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        #frase-motivadora {
+            font-family: 'Georgia', serif; font-style: italic; color: #94a3b8;
+            font-size: 0.95em; text-align: center; max-width: 80%;
+            margin-bottom: 30px; line-height: 1.4; min-height: 3em;
+        }
+
+        #auth h2 { margin-bottom: 25px; letter-spacing: 4px; color: #fff; font-size: 20px; font-weight: 300; }
 
         .auth-input { 
-            padding: 18px; 
-            border-radius: 14px; 
-            border: 2px solid #334155; 
-            text-align: center; 
-            font-size: 24px; 
-            width: 260px; 
-            margin-bottom: 25px; 
-            outline: none; 
-            background: #1e293b;
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 18px; border-radius: 14px; border: 2px solid #334155; 
+            text-align: center; font-size: 24px; width: 260px; margin-bottom: 20px; 
+            outline: none; background: #1e293b; color: white;
         }
 
         .auth-btn {
-            padding: 16px 60px; 
-            background: var(--p); 
-            color: white; 
-            border: none; 
-            border-radius: 14px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 16px; 
-            transition: 0.3s;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+            padding: 16px 60px; background: var(--p); color: white; border: none; 
+            border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 16px;
         }
 
-        /* CABECERA Y FILTROS */
+        /* UI PRINCIPAL */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 5px; border-bottom: 1px solid #e2e8f0; }
-        .search-box input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; margin-bottom: 12px; font-size: 16px; outline: none; }
+        .search-box input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; margin-bottom: 12px; outline: none; }
         .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .tag-pill { padding: 8px 16px; border-radius: 20px; background: white; border: 2px solid #eee; font-size: 0.8em; white-space: nowrap; cursor: pointer; font-weight: bold; }
         
-        /* NOTAS */
         .dia { background: var(--card); border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden; }
         .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; text-transform: uppercase; }
         .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; border-left: 5px solid transparent; cursor: pointer; }
-        .nota-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 0.8em; color: #94a3b8; }
-
-        /* MODAL */
+        
         #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 450px; padding: 25px; border-radius: 20px; box-sizing: border-box; }
         textarea { width: 100%; height: 160px; margin: 15px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 17px; box-sizing: border-box; resize: none; font-family: serif; }
 
-        /* CONTROLES INFERIORES */
         .panel { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
-        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 30px; cursor: pointer; box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3); transition: 0.3s; }
+        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 30px; cursor: pointer; }
         .btn-mic.pre-warm { background: var(--wait); animation: blink 0.5s infinite; }
         .btn-mic.recording { background: var(--accent); animation: pulse 1.2s infinite; }
-        
         .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 14px; border-radius: 10px; font-weight: bold; width: 100%; margin-top: 20px; cursor: pointer; }
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
@@ -104,13 +75,16 @@
 <body>
 
     <div id="auth">
+        <div id="fecha-actual"></div>
+        <div id="hora-actual">00:00:00</div>
+        <div id="frase-motivadora"></div>
         <h2>ESCRITOR PRO</h2>
         <input type="password" id="pin" class="auth-input" placeholder="PIN de acceso" inputmode="numeric">
         <button onclick="login()" class="auth-btn">ENTRAR</button>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar en el manuscrito..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar notas..." oninput="render()"></div>
         <div class="tag-menu" id="tag-filters"></div>
     </div>
 
@@ -118,39 +92,66 @@
 
     <div id="editor-modal">
         <div class="modal-content">
-            <h3 style="margin:0;">Editar fragmento</h3>
+            <h3 style="margin:0;">Editar</h3>
             <textarea id="edit-texto"></textarea>
             <div id="tag-options" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"></div>
             <div style="display:flex; gap:10px; margin-top:15px;">
                 <button onclick="saveEdit()" style="flex:2; padding:15px; background:var(--p); color:white; border:none; border-radius:10px; font-weight:bold;">GUARDAR</button>
                 <button onclick="closeModal()" style="flex:1; padding:15px; background:#f1f5f9; border:none; border-radius:10px;">X</button>
             </div>
-            <button onclick="deleteNote()" class="btn-delete">BORRAR NOTA DEFINITIVAMENTE</button>
+            <button onclick="deleteNote()" class="btn-delete">BORRAR DEFINITIVAMENTE</button>
         </div>
     </div>
 
     <div class="panel">
         <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:12px 18px; border-radius:12px; font-weight:bold;">💾 TXT</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size:10px; font-weight:bold; width:85px; color:#64748b; text-align:right; text-transform:uppercase;">Listo</div>
+        <div id="st" style="font-size:10px; font-weight:bold; width:85px; color:#64748b; text-align:right;">Listo</div>
     </div>
 
     <script>
         const PIN_CORRECTO = "1234";
-        const ETIQUETAS = [
-            { id: 't1', nombre: 'Capítulo', color: '#6366f1' },
-            { id: 't2', nombre: 'Personaje', color: '#10b981' },
-            { id: 't3', nombre: 'Idea', color: '#f59e0b' },
-            { id: 't4', nombre: 'Revisar', color: '#ef4444' }
+        const FRASES = [
+            "Escribir es la pintura de la voz.", "La pluma es la lengua del alma.", "No hay hoja en blanco que resista el primer golpe.",
+            "Un libro se escribe palabra a palabra.", "Tu historia solo la puedes contar tú.", "Deja que tus dedos hablen hoy.",
+            "La inspiración existe, pero tiene que encontrarte trabajando.", "Escribir es un oficio que se aprende escribiendo.",
+            "Cualquier momento es bueno para un nuevo capítulo.", "Tu manuscrito te está esperando.", "Hoy es un gran día para una gran escena.",
+            "No busques la perfección, busca la emoción.", "Un escritor es alguien que no se rinde.", "Las palabras son tu superpoder.",
+            "Hazlo real. Escríbelo.", "Tu mundo interior merece ser compartido.", "Crea el libro que te gustaría leer.",
+            "El primer borrador es solo para ti.", "Escribir es descubrir lo que llevas dentro.", "Confía en tu voz propia.",
+            "Poco a poco, el libro crece.", "Cada frase cuenta.", "No pares hasta que estés orgulloso.", "El secreto está en empezar.",
+            "Convierte tus ideas en tinta.", "Tus personajes tienen mucho que decir.", "La magia ocurre cuando escribes.",
+            "Sé valiente frente a la página.", "El silencio es el mejor aliado del escritor.", "Escribe sin miedo, edita sin piedad.",
+            "Tus ideas son valiosas.", "Crea algo nuevo hoy.", "La escritura es el eco del pensamiento.", "Sigue adelante, vas por buen camino.",
+            "El papel lo aguanta todo.", "Tu imaginación no tiene límites.", "Cada palabra te acerca al final.",
+            "Escribe la historia que arde en tu interior.", "Disfruta del proceso creativo.", "Hoy el micro es tu pluma.",
+            "Dale vida a tus pensamientos.", "Un paso más cerca de tu libro.", "No pienses, solo narra.", "Tu talento es único.",
+            "Escribir es ordenar el caos.", "Regálate tiempo para crear.", "La disciplina vence al talento.",
+            "Cada nota es un tesoro.", "Haz que cada palabra brille.", "Tu libro comienza aquí."
         ];
 
-        let notas = JSON.parse(localStorage.getItem('notas_v6_2')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v6_4')) || [];
         let editId = null;
         let tempTagId = null;
         let filtroTag = "";
         let silenceTimer;
-
         const isWindows = navigator.platform.toUpperCase().indexOf('WIN') >= 0;
+
+        // INICIALIZACIÓN DE RELOJ Y FECHA
+        function actualizarReloj() {
+            const ahora = new Date();
+            const fechaTxt = ahora.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const horaTxt = ahora.toLocaleTimeString('es-ES', { hour12: false });
+            
+            document.getElementById('fecha-actual').innerText = fechaTxt;
+            document.getElementById('hora-actual').innerText = horaTxt;
+        }
+
+        window.onload = () => {
+            actualizarReloj();
+            setInterval(actualizarReloj, 1000);
+            document.getElementById('frase-motivadora').innerText = `"${FRASES[Math.floor(Math.random() * FRASES.length)]}"`;
+        };
 
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
@@ -165,7 +166,6 @@
             rec.lang = 'es-ES';
             rec.continuous = true; 
             rec.interimResults = true;
-
             const btn = document.getElementById('btn');
             const st = document.getElementById('st');
             let acumulado = "";
@@ -177,21 +177,17 @@
                 acumulado = "";
                 if (isWindows) {
                     btn.classList.add('pre-warm');
-                    st.innerText = "Cargando...";
+                    st.innerText = "Preparando...";
                     rec.start();
                     setTimeout(() => {
                         if(btn.classList.contains('pre-warm')) {
-                            btn.classList.remove('pre-warm');
-                            btn.classList.add('recording');
-                            st.innerText = "Habla ahora";
+                            btn.classList.remove('pre-warm'); btn.classList.add('recording'); st.innerText = "Habla ahora";
                         }
                     }, 1200); 
-                } else {
-                    rec.start();
-                }
+                } else { rec.start(); }
             };
 
-            rec.onstart = () => { if(!isWindows) { btn.classList.add('recording'); st.innerText = "Escuchando"; } };
+            rec.onstart = () => { if(!isWindows) { btn.classList.add('recording'); st.innerText = "Grabando"; } };
 
             rec.onresult = (e) => {
                 let intermedio = "";
@@ -199,13 +195,9 @@
                     if (e.results[i].isFinal) acumulado += e.results[i][0].transcript + " ";
                     else intermedio += e.results[i][0].transcript;
                 }
-                
-                // Temporizador de silencio: 4 segundos sin hablar = Guardado automático
                 clearTimeout(silenceTimer);
                 silenceTimer = setTimeout(() => {
-                    if(btn.classList.contains('recording') && (acumulado.length > 0 || intermedio.length > 0)) {
-                        rec.stop();
-                    }
+                    if(btn.classList.contains('recording') && (acumulado.length > 0)) rec.stop();
                 }, 4000);
             };
 
@@ -213,9 +205,7 @@
                 btn.className = 'btn-mic';
                 if (acumulado.trim().length > 1) {
                     const nuevaNota = {
-                        id: Date.now(),
-                        t: acumulado.trim(),
-                        tagId: null,
+                        id: Date.now(), t: acumulado.trim(), tagId: null,
                         h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                         f: new Date().toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'})
                     };
@@ -223,42 +213,47 @@
                     saveAndRender();
                     st.innerText = "Guardado";
                 } else { st.innerText = "Listo"; }
-                setTimeout(() => st.innerText = isWindows ? "PC Mode" : "Listo", 2000);
+                setTimeout(() => st.innerText = "Listo", 2000);
             };
         }
 
         function saveAndRender() {
             notas.sort((a, b) => b.id - a.id);
-            localStorage.setItem('notas_v6_2', JSON.stringify(notas));
+            localStorage.setItem('notas_v6_4', JSON.stringify(notas));
             render();
         }
 
         function render() {
             const cont = document.getElementById('lista');
             const term = document.getElementById('busqueda').value.toLowerCase();
+            const etiquetasArr = [
+                { id: 't1', nombre: 'Capítulo', color: '#6366f1' },
+                { id: 't2', nombre: 'Personaje', color: '#10b981' },
+                { id: 't3', nombre: 'Idea', color: '#f59e0b' },
+                { id: 't4', nombre: 'Revisar', color: '#ef4444' }
+            ];
             
             document.getElementById('tag-filters').innerHTML = `<div class="tag-pill" style="background:${filtroTag===''?'#eee':'white'}" onclick="filtrar('')">Todas</div>` + 
-                ETIQUETAS.map(t => `<div class="tag-pill" style="border-color:${t.color}; color:${t.color}; background:${filtroTag===t.id?t.color+'20':'white'}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
+                etiquetasArr.map(t => `<div class="tag-pill" style="border-color:${t.color}; color:${t.color}; background:${filtroTag===t.id?t.color+'20':'white'}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
 
             const filtradas = notas.filter(n => (filtroTag === "" || n.tagId === filtroTag) && n.t.toLowerCase().includes(term));
             const grupos = filtradas.reduce((acc, n) => {
                 if (!acc[n.f]) acc[n.f] = [];
-                acc[n.f].push(n);
-                return acc;
+                acc[n.f].push(n); return acc;
             }, {});
 
             cont.innerHTML = Object.keys(grupos).map(f => `
                 <div class="dia">
                     <div class="dia-h">${f}</div>
                     ${grupos[f].map(n => {
-                        const tag = ETIQUETAS.find(t => t.id === n.tagId);
+                        const tag = etiquetasArr.find(t => t.id === n.tagId);
                         return `
                         <div class="nota" style="border-left-color:${tag?tag.color:'transparent'}" onclick="openEdit(${n.id})">
                             <div class="nota-header">
                                 <span>${n.h}</span>
                                 ${tag? `<span style="font-weight:bold;color:${tag.color}">${tag.nombre.toUpperCase()}</span>` : ''}
                             </div>
-                            <div style="line-height:1.5; font-size:1.05em;">${n.t}</div>
+                            <div style="line-height:1.5;">${n.t}</div>
                         </div>`;
                     }).join('')}
                 </div>
@@ -266,11 +261,14 @@
         }
 
         function openEdit(id) {
-            editId = id;
-            const nota = notas.find(n => n.id === id);
+            editId = id; const nota = notas.find(n => n.id === id);
             document.getElementById('edit-texto').value = nota.t;
             tempTagId = nota.tagId;
-            document.getElementById('tag-options').innerHTML = ETIQUETAS.map(t => `
+            const etiquetasArr = [
+                { id: 't1', nombre: 'Capítulo', color: '#6366f1' }, { id: 't2', nombre: 'Personaje', color: '#10b981' },
+                { id: 't3', nombre: 'Idea', color: '#f59e0b' }, { id: 't4', nombre: 'Revisar', color: '#ef4444' }
+            ];
+            document.getElementById('tag-options').innerHTML = etiquetasArr.map(t => `
                 <div onclick="tempTagId='${t.id}';this.parentElement.querySelectorAll('div').forEach(d=>d.style.background='none');this.style.background='${t.color}30'" 
                      style="padding:10px; border:1px solid ${t.color}; border-radius:8px; cursor:pointer; font-size:12px; text-align:center; ${tempTagId===t.id?'background:'+t.color+'30':''}">
                      ${t.nombre}
@@ -283,15 +281,13 @@
             const idx = notas.findIndex(n => n.id === editId);
             notas[idx].t = document.getElementById('edit-texto').value;
             notas[idx].tagId = tempTagId;
-            closeModal();
-            saveAndRender();
+            closeModal(); saveAndRender();
         }
 
         function deleteNote() {
-            if(confirm("Esta nota se borrará permanentemente. ¿Continuar?")) {
+            if(confirm("¿Borrar definitivamente?")) {
                 notas = notas.filter(n => n.id !== editId);
-                closeModal();
-                saveAndRender();
+                closeModal(); saveAndRender();
             }
         }
 
@@ -299,13 +295,12 @@
         function filtrar(id) { filtroTag = id; render(); }
         
         function exportarTodo() {
-            let texto = "MI MANUSCRITO - EXPORTACIÓN\n" + "=".repeat(30) + "\n\n";
+            let texto = "MI LIBRO\n\n";
             notas.forEach(n => { texto += `[${n.f} ${n.h}]\n${n.t}\n\n---\n\n`; });
             const blob = new Blob([texto], {type:'text/plain'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "manuscrito_completo.txt";
-            a.click();
+            a.download = "manuscrito.txt"; a.click();
         }
     </script>
 </body>
