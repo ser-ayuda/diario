@@ -3,74 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro</title>
+    <title>Escritor Pro | Inteligencia de Voz</title>
     <style>
-        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; }
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; }
+        
+        /* Pantalla de Seguridad */
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        
-        /* Cabecera y Filtros de Colores */
-        .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 5px; border-bottom: 1px solid #e2e8f0; }
-        .search-box input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; outline: none; }
-        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-        
-        /* Estilo de las píldoras de filtro */
-        .tag-pill { padding: 8px 16px; border-radius: 20px; background: white; border: 2px solid #eee; font-size: 0.8em; white-space: nowrap; font-family: sans-serif; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .tag-pill.active { transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .auth-input { padding: 15px; border-radius: 12px; border: none; text-align: center; font-size: 20px; width: 200px; margin-bottom: 20px; }
 
-        .dia { background: var(--card); border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; font-family: sans-serif; }
-        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; border-left: 6px solid transparent; }
-        .nota-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .nota-tag { font-size: 0.7em; padding: 3px 10px; border-radius: 5px; font-family: sans-serif; font-weight: bold; text-transform: uppercase; }
+        /* Cabecera y Filtros Dinámicos */
+        .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 5px; border-bottom: 1px solid #e2e8f0; }
+        .search-box input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; margin-bottom: 12px; font-size: 16px; outline: none; transition: 0.3s; }
+        .search-box input:focus { border-color: var(--p); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        
+        .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .tag-pill { padding: 8px 16px; border-radius: 20px; background: white; border: 2px solid #eee; font-size: 0.8em; white-space: nowrap; font-family: sans-serif; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .tag-pill.active { transform: scale(1.05); }
+
+        /* Estilo de Notas y Diario */
+        .dia { background: var(--card); border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden; }
+        .dia-h { background: #f1f5f9; padding: 12px 15px; font-weight: bold; font-size: 0.85em; color: #64748b; font-family: sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; border-left: 6px solid transparent; transition: 0.2s; }
+        .nota:active { background: #f8fafc; }
+        .nota-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .nota-tag { font-size: 0.7em; padding: 4px 10px; border-radius: 6px; font-family: sans-serif; font-weight: bold; }
         .hora { color: #94a3b8; font-size: 0.75em; font-family: sans-serif; }
 
-        /* Modal y Editor */
-        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 90%; max-width: 450px; padding: 20px; border-radius: 20px; }
-        textarea { width: 100%; height: 140px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: serif; font-size: 16px; box-sizing: border-box; }
-        .tag-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
-        .tag-opt { padding: 12px; border-radius: 10px; border: 2px solid #f1f5f9; cursor: pointer; font-family: sans-serif; text-align: center; font-size: 0.85em; font-weight: bold; transition: 0.2s; }
-        .tag-opt.selected { border-color: #334155; transform: scale(1.02); }
+        /* Modal de Edición */
+        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1500; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 92%; max-width: 450px; padding: 25px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 160px; margin: 15px 0; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-family: serif; font-size: 17px; box-sizing: border-box; line-height: 1.5; }
+        .tag-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0; }
+        .tag-opt { padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; cursor: pointer; font-family: sans-serif; text-align: center; font-size: 0.9em; font-weight: bold; }
+        .tag-opt.selected { border-color: #334155; transform: translateY(-2px); }
 
-        /* Controles inferiores */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .btn-mic { width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 28px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
-        .recording { background: #ef4444; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        /* Panel de Control Inferior */
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-mic { width: 70px; height: 70px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 30px; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4); cursor: pointer; }
+        .recording { background: var(--accent); animation: pulse 1.2s infinite; }
+        #st { font-size: 12px; font-weight: bold; font-family: sans-serif; color: #94a3b8; transition: 0.3s; }
+
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
+
     <div id="auth">
-        <h2 style="font-family:sans-serif;">MI LIBRO</h2>
-        <input type="password" id="pin" placeholder="PIN" style="padding:15px; border-radius:10px; text-align:center; border:none; font-size:18px;">
-        <button onclick="login()" style="margin-top:20px; padding:12px 40px; background:var(--p); color:white; border:none; border-radius:10px; font-weight:bold;">ACCEDER</button>
+        <h2 style="font-family:sans-serif; margin-bottom:30px;">DIARIO PRIVADO</h2>
+        <input type="password" id="pin" class="auth-input" placeholder="Introduce tu PIN">
+        <button onclick="login()" style="padding:15px 60px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">ABRIR</button>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar en el libro..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar palabras o capítulos..." oninput="render()"></div>
         <div class="tag-menu" id="tag-filters"></div>
     </div>
 
-    <div id="lista" style="max-width: 600px; margin: 0 auto;"></div>
+    <div id="lista" style="max-width: 650px; margin: 0 auto;"></div>
 
     <div id="editor-modal">
         <div class="modal-content">
-            <h3 style="margin:0; font-family:sans-serif;">Organizar Nota</h3>
+            <h3 style="margin:0; font-family:sans-serif;">Editar Registro</h3>
             <textarea id="edit-texto"></textarea>
             <div class="tag-selector" id="tag-options"></div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="saveEdit()" style="flex:2; padding:15px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">GUARDAR CAMBIOS</button>
-                <button onclick="closeModal()" style="flex:1; padding:15px; background:#f1f5f9; border:none; border-radius:12px; color:#64748b;">Cerrar</button>
+            <div style="display:flex; gap:12px;">
+                <button onclick="saveEdit()" style="flex:2; padding:16px; background:var(--p); color:white; border:none; border-radius:14px; font-weight:bold;">GUARDAR</button>
+                <button onclick="closeModal()" style="flex:1; padding:16px; background:#f1f5f9; border:none; border-radius:14px; color:#64748b;">Cerrar</button>
             </div>
-            <button onclick="deleteNote()" style="width:100%; margin-top:20px; background:none; color:#94a3b8; border:none; font-size:0.8em;">Eliminar nota definitivamente</button>
+            <button onclick="deleteNote()" style="width:100%; margin-top:25px; background:none; color:#cbd5e1; border:none; font-size:0.8em; cursor:pointer;">Eliminar nota</button>
         </div>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:bold; font-family:sans-serif;">EXPORTAR</button>
+        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:14px 25px; border-radius:14px; font-weight:bold; font-family:sans-serif;">💾 LIBRO</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size: 10px; color: #94a3b8; font-family:sans-serif;">Listo</div>
+        <div id="st">LISTO</div>
     </div>
 
     <script>
@@ -82,7 +90,7 @@
             { id: 't4', nombre: 'Corregir', color: '#ef4444' }
         ];
 
-        let notas = JSON.parse(localStorage.getItem('diario_v9')) || [];
+        let notas = JSON.parse(localStorage.getItem('diario_v_final')) || [];
         let editId = null;
         let tempTagId = null;
         let filtroTag = "";
@@ -91,25 +99,53 @@
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
                 render();
-            } else { alert("PIN incorrecto"); }
+            } else { alert("Acceso Denegado"); }
         }
 
+        // --- SISTEMA DE VOZ CON GESTIÓN DE LATENCIA ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'es-ES';
             const btn = document.getElementById('btn');
-            rec.onstart = () => btn.classList.add('recording');
-            rec.onend = () => btn.classList.remove('recording');
-            btn.onclick = () => rec.start();
+            const st = document.getElementById('st');
+
+            btn.onclick = () => {
+                try {
+                    rec.start();
+                    st.innerText = "INICIANDO...";
+                    st.style.color = "#f59e0b";
+                } catch(e) {}
+            };
+
+            rec.onstart = () => {
+                btn.classList.add('recording');
+                st.innerText = "¡HABLA AHORA!";
+                st.style.color = "#ef4444";
+            };
+
+            rec.onend = () => {
+                btn.classList.remove('recording');
+                st.innerText = "GUARDADO";
+                st.style.color = "#10b981";
+                setTimeout(() => { st.innerText = "LISTO"; st.style.color = "#94a3b8"; }, 2000);
+            };
+
             rec.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
-                notas.unshift({ id: Date.now(), t: txt, tagId: null, h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), f: new Date().toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}) });
-                localStorage.setItem('diario_v9', JSON.stringify(notas));
+                notas.unshift({ 
+                    id: Date.now(), 
+                    t: txt, 
+                    tagId: null, 
+                    h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 
+                    f: new Date().toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'}) 
+                });
+                localStorage.setItem('diario_v_final', JSON.stringify(notas));
                 render();
             };
         }
 
+        // --- FUNCIONES DE EDICIÓN ---
         function openEdit(id) {
             editId = id;
             const nota = notas.find(n => n.id === id);
@@ -123,21 +159,18 @@
             const container = document.getElementById('tag-options');
             container.innerHTML = MIS_ETIQUETAS.map(tag => `
                 <div class="tag-opt ${tempTagId === tag.id ? 'selected' : ''}" 
-                     style="background: ${tag.color}15; color: ${tag.color}; border-color: ${tempTagId === tag.id ? tag.color : '#f1f5f9'}"
+                     style="background: ${tag.color}10; color: ${tag.color}; border-color: ${tempTagId === tag.id ? tag.color : '#f1f5f9'}"
                      onclick="setTempTag('${tag.id}')">${tag.nombre}</div>
-            `).join('') + `<div class="tag-opt ${!tempTagId ? 'selected' : ''}" onclick="setTempTag(null)">Ninguna</div>`;
+            `).join('') + `<div class="tag-opt ${!tempTagId ? 'selected' : ''}" onclick="setTempTag(null)">Sin etiqueta</div>`;
         }
 
-        function setTempTag(id) {
-            tempTagId = id;
-            renderTagOptions();
-        }
+        function setTempTag(id) { tempTagId = id; renderTagOptions(); }
 
         function saveEdit() {
             const idx = notas.findIndex(n => n.id === editId);
             notas[idx].t = document.getElementById('edit-texto').value;
             notas[idx].tagId = tempTagId;
-            localStorage.setItem('diario_v9', JSON.stringify(notas));
+            localStorage.setItem('diario_v_final', JSON.stringify(notas));
             closeModal();
             render();
         }
@@ -145,9 +178,9 @@
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
 
         function deleteNote() {
-            if(confirm("¿Deseas eliminar esta nota?")) {
+            if(confirm("¿Eliminar nota?")) {
                 notas = notas.filter(n => n.id !== editId);
-                localStorage.setItem('diario_v9', JSON.stringify(notas));
+                localStorage.setItem('diario_v_final', JSON.stringify(notas));
                 closeModal();
                 render();
             }
@@ -159,20 +192,20 @@
             const cont = document.getElementById('lista');
             const term = document.getElementById('busqueda').value.toLowerCase();
             
-            // Render de filtros con colores dinámicos
-            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill" style="border-color:#ddd; ${filtroTag===''?'background:#ddd':''}" onclick="filtrar('')">Todo</div>` + 
-                MIS_ETIQUETAS.map(t => `
-                    <div class="tag-pill ${filtroTag===t.id?'active':''}" 
-                         style="border-color:${t.color}; color:${t.color}; background:${filtroTag===t.id ? t.color : 'white'}; color:${filtroTag===t.id ? 'white' : t.color}" 
-                         onclick="filtrar('${t.id}')">${t.nombre}</div>
-                `).join('');
+            // Render de filtros superiores
+            document.getElementById('tag-filters').innerHTML = `
+                <div class="tag-pill" style="border-color:#ddd; background:${filtroTag===''?'#ddd':'white'}" onclick="filtrar('')">Todo</div>` + 
+                MIS_ETIQUETAS.map(t => {
+                    const active = filtroTag === t.id;
+                    return `<div class="tag-pill" style="border-color:${t.color}; color:${active?'white':t.color}; background:${active?t.color:'white'}" onclick="filtrar('${t.id}')">${t.nombre}</div>`;
+                }).join('');
 
             const filtradas = notas.filter(n => (filtroTag === "" || n.tagId === filtroTag) && n.t.toLowerCase().includes(term));
             const grupos = filtradas.reduce((acc, n) => { if (!acc[n.f]) acc[n.f] = []; acc[n.f].push(n); return acc; }, {});
 
             cont.innerHTML = Object.keys(grupos).map(f => `
                 <div class="dia">
-                    <div class="dia-h">${f.toUpperCase()}</div>
+                    <div class="dia-h">${f}</div>
                     ${grupos[f].map(n => {
                         const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
                         return `<div class="nota" style="border-left-color:${tag?tag.color:'transparent'}" onclick="openEdit(${n.id})">
@@ -180,7 +213,7 @@
                                 ${tag?`<span class="nota-tag" style="background:${tag.color}15;color:${tag.color}">${tag.nombre}</span>`:'<span></span>'}
                                 <span class="hora">${n.h}</span>
                             </div>
-                            <div style="line-height:1.6">${n.t}</div>
+                            <div style="line-height:1.6; font-size:1.1em;">${n.t}</div>
                         </div>`;
                     }).join('')}
                 </div>
@@ -188,15 +221,17 @@
         }
 
         function exportarTodo() {
-            let out = "MI LIBRO PERSONAL\n\n";
-            notas.forEach(n => {
+            let out = "MI MANUSCRITO - EXPORTACIÓN DIGITAL\n\n";
+            notas.slice().reverse().forEach(n => {
                 const tag = MIS_ETIQUETAS.find(t => t.id === n.tagId);
-                out += `${n.f} [${n.h}] ${tag?'('+tag.nombre+')':''}\n${n.t}\n\n`;
+                out += `FECHA: ${n.f} | HORA: ${n.h}\n`;
+                if(tag) out += `CATEGORÍA: ${tag.nombre}\n`;
+                out += `CONTENIDO: ${n.t}\n\n--------------------------\n\n`;
             });
             const blob = new Blob([out], {type:'text/plain'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "mi_libro.txt";
+            a.download = "mi_libro_respaldo.txt";
             a.click();
         }
     </script>
