@@ -3,36 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v7.5</title>
+    <title>Escritor Pro | v7.6</title>
     <style>
         :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; overflow-x: hidden; }
-        .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.4; z-index: 3000; }
+        
+        /* ETIQUETA DE VERSIÓN GLOBAL */
+        .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.4; z-index: 3000; font-weight: bold; pointer-events: none; }
 
         /* PANTALLA ACCESO */
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px; text-align: center; }
-        #hora-actual { font-size: 3.5em; font-family: monospace; font-weight: 200; margin-bottom: 10px; }
-        #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; }
-        .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
-        .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; }
+        #hora-actual { font-size: 3.5em; font-family: monospace; font-weight: 200; margin-bottom: 5px; }
+        #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; max-width: 80%; }
+        .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; transition: 0.3s; }
+        .auth-input:focus { border-color: var(--p); box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+        .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
+        .login-version { margin-top: 20px; font-size: 0.7em; color: #475569; letter-spacing: 1px; }
 
         /* BUSCADOR Y LISTA */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; }
-        .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; }
+        .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         
         #lista { margin-top: 10px; }
         .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 8px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; text-transform: uppercase; }
-        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.5; cursor: pointer; }
+        .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.6; cursor: pointer; }
         .nota:active { background: #f8fafc; }
 
         /* EDITOR PANTALLA COMPLETA */
         #editor-modal { display: none; position: fixed; inset: 0; background: white; z-index: 2500; flex-direction: column; padding: 20px; }
-        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.6; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 10px; border-radius: 10px; }
+        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.7; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 10px; border-radius: 10px; }
 
         /* PANEL INFERIOR */
         .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -5px 15px rgba(0,0,0,0.02); }
-        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(99,102,241,0.4); }
+        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(99,102,241,0.4); cursor: pointer; }
         .btn-mic.recording { background: var(--accent); animation: pulse 1s infinite; }
         
         #live-preview { position: fixed; bottom: 110px; left: 15px; right: 15px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; text-align: center; }
@@ -42,17 +46,18 @@
 </head>
 <body>
 
-    <div class="version-tag">v7.5 (Clear Export)</div>
+    <div class="version-tag">v7.6</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-inicio">"Cargando..."</div>
-        <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
-        <button onclick="login()" class="auth-btn">ENTRAR</button>
+        <div id="frase-inicio">"Capturando tus ideas..."</div>
+        <input type="password" id="pin" class="auth-input" placeholder="Introduce PIN" inputmode="numeric">
+        <button onclick="login()" class="auth-btn">DESBLOQUEAR</button>
+        <div class="login-version">BUILD VERSION 7.6</div>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar notas..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar en mis escritos..." oninput="render()"></div>
     </div>
 
     <div id="lista"></div>
@@ -61,14 +66,14 @@
     <div id="editor-modal">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold; font-size:1.1em;">← Cancelar</button>
-            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 25px; border-radius:12px; font-weight:bold;">LISTO</button>
+            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 25px; border-radius:12px; font-weight:bold;">GUARDAR</button>
         </div>
         <textarea id="edit-texto" placeholder="Escribe aquí..."></textarea>
-        <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:20px; font-size:0.9em; font-weight: 500;">ELIMINAR NOTA</button>
+        <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:20px; font-size:0.9em; font-weight: 500;">BORRAR DEFINITIVAMENTE</button>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 18px; border-radius:12px; font-weight:bold; color: #475569;">EXPORTAR</button>
+        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 18px; border-radius:12px; font-weight:bold; color: #475569; cursor: pointer;">EXPORTAR</button>
         <button id="btn" class="btn-mic">🎤</button>
         <div id="st" style="font-size:10px; font-weight:bold; width:50px; text-align:right; opacity:0.4;">LISTO</div>
     </div>
@@ -79,11 +84,13 @@
             "Tu historia es única, cuéntala hoy.",
             "Escribir es ordenar el caos de la mente.",
             "Cada palabra es un paso hacia tu libro.",
-            "No esperes la inspiración, búscala con tu voz."
+            "No esperes la inspiración, búscala con tu voz.",
+            "El papel es más paciente que los hombres.",
+            "Escribir es un acto de coraje."
         ];
         
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v7_5')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v7_6')) || [];
         let editId = null;
         let isRecording = false;
 
@@ -124,7 +131,6 @@
                 preview.style.display = "none";
                 
                 if (tempText.trim().length > 1) {
-                    // Limpieza preventiva de caracteres de control
                     const limpio = tempText.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, "");
                     const nueva = {
                         id: Date.now(),
@@ -138,16 +144,19 @@
             };
         }
 
-        // --- LÓGICA APP ---
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
                 render();
-            } else { alert("PIN Incorrecto"); }
+            } else { 
+                const input = document.getElementById('pin');
+                input.style.borderColor = 'red';
+                setTimeout(() => input.style.borderColor = '#334155', 500);
+            }
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_5', JSON.stringify(notas));
+            localStorage.setItem('notas_v7_6', JSON.stringify(notas));
             render();
         }
 
@@ -169,7 +178,7 @@
                         ${n.t}
                     </div>`).join('')}
                 </div>
-            `).join('') : '<div style="text-align:center; opacity:0.3; margin-top:50px;">No hay notas aún</div>';
+            `).join('') : '<div style="text-align:center; opacity:0.3; margin-top:50px;">Bandeja vacía</div>';
         }
 
         function openEdit(id) {
@@ -187,39 +196,26 @@
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
         
         function deleteNote() {
-            if(confirm("¿Eliminar nota para siempre?")) {
+            if(confirm("¿Seguro que quieres eliminar esta nota?")) {
                 notas = notas.filter(n => n.id !== editId);
                 closeModal(); saveAndRender();
             }
         }
 
-        // --- EXPORTACIÓN MEJORADA (FIX CARACTERES) ---
         function exportarTodo() {
-            if (notas.length === 0) return alert("No hay notas para exportar");
-            
-            // 1. Construir el texto con separadores claros
+            if (notas.length === 0) return alert("Nada que exportar");
             let txt = "MI DIARIO PERSONAL\r\n" + "=".repeat(20) + "\r\n\r\n";
             notas.forEach(n => {
-                txt += `FECHA: ${n.f} | HORA: ${n.h}\r\n`;
-                txt += `${n.t}\r\n`;
-                txt += "-".repeat(15) + "\r\n\r\n";
+                txt += `[${n.f} - ${n.h}]\r\n${n.t}\r\n${"-".repeat(15)}\r\n\r\n`;
             });
-
-            // 2. Limpieza final de caracteres extraños invisibles
             txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
-
-            // 3. Crear Blob con BOM (Byte Order Mark) para UTF-8. 
-            // Esto le dice a Windows/Android que el archivo tiene tildes y eñes.
             const blob = new Blob(["\ufeff", txt], { type: 'text/plain;charset=utf-8' });
-            
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `mis_notas_${new Date().toISOString().slice(0,10)}.txt`;
+            a.download = `diario_pro_${new Date().toISOString().slice(0,10)}.txt`;
             a.click();
-            URL.revokeObjectURL(a.href);
         }
 
-        // Reloj y Frases
         setInterval(() => {
             const h = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             if(document.getElementById('hora-actual')) document.getElementById('hora-actual').innerText = h;
