@@ -3,52 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v7.2</title>
+    <title>Escritor Pro | v7.3</title>
     <style>
-        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; --wait: #f59e0b; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 180px; }
-        .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.5; z-index: 3000; font-weight: bold; }
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 180px; }
+        .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.5; z-index: 3000; font-weight: bold; background: #ddd; padding: 2px 5px; border-radius: 4px; }
         
-        /* ACCESO */
+        /* PANTALLA ACCESO */
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        #hora-actual { font-size: 3em; font-family: monospace; margin-bottom: 20px; font-weight: 200; }
+        #hora-actual { font-size: 3.5em; font-family: monospace; margin-bottom: 20px; font-weight: 200; }
         .auth-input { padding: 18px; border-radius: 14px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 220px; margin-bottom: 20px; background: #1e293b; color: white; outline: none; }
         .auth-btn { padding: 16px 60px; background: var(--p); color: white; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; }
 
-        /* UI */
+        /* UI PRINCIPAL */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
-        .search-box input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; outline: none; }
+        .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; outline: none; font-size: 16px; }
         #lista { max-width: 700px; margin: 0 auto; }
         .dia { background: var(--card); border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; }
-        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; text-transform: uppercase; }
+        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s; }
+        .nota:active { background: #f1f5f9; }
         
-        /* MODAL */
-        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; align-items: center; justify-content: center; padding: 15px; }
-        .modal-content { background: white; width: 100%; max-width: 800px; padding: 20px; border-radius: 20px; box-sizing: border-box; }
-        textarea { width: 100%; height: 350px; margin: 15px 0; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 20px; line-height: 1.6; resize: none; }
+        /* MODAL EDITOR */
+        #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1500; align-items: center; justify-content: center; padding: 15px; }
+        .modal-content { background: white; width: 100%; max-width: 800px; padding: 25px; border-radius: 20px; box-sizing: border-box; }
+        textarea { width: 100%; height: 350px; margin: 15px 0; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 19px; line-height: 1.6; resize: none; font-family: serif; }
 
-        /* PANEL */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 35px; cursor: pointer; transition: 0.3s; }
+        /* PANEL CONTROL */
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .btn-mic { width: 85px; height: 85px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .btn-mic.recording { background: var(--accent); animation: pulse 1.2s infinite; }
-        #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; text-align: center; color: var(--p); font-weight: bold; font-style: italic; pointer-events: none; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
+        
+        #live-preview { position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 600px; text-align: center; color: var(--p); font-weight: 600; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: none; z-index: 1100; border: 2px solid var(--p); }
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v7.2 (Fix Duplicados)</div>
+    <div class="version-tag">v7.3 (Anti-Repetición)</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
         <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
-        <button onclick="login()" class="auth-btn">ENTRAR</button>
+        <button onclick="login()" class="auth-btn">DESBLOQUEAR</button>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar notas..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar en el diario..." oninput="render()"></div>
     </div>
 
     <div id="lista"></div>
@@ -57,27 +59,27 @@
     <div id="editor-modal">
         <div class="modal-content">
             <textarea id="edit-texto"></textarea>
-            <div style="display:flex; gap:10px;">
-                <button onclick="saveEdit()" style="flex:2; padding:18px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">GUARDAR</button>
-                <button onclick="closeModal()" style="flex:1; padding:18px; background:#f1f5f9; border:none; border-radius:12px;">X</button>
+            <div style="display:flex; gap:12px;">
+                <button onclick="saveEdit()" style="flex:2; padding:20px; background:var(--p); color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer;">GUARDAR</button>
+                <button onclick="closeModal()" style="flex:1; padding:20px; background:#f1f5f9; border:none; border-radius:15px; cursor:pointer;">CERRAR</button>
             </div>
-            <button onclick="deleteNote()" style="width:100%; margin-top:15px; background:none; border:none; color:var(--accent); cursor:pointer; font-size: 12px;">Eliminar definitivamente</button>
+            <button onclick="deleteNote()" style="width:100%; margin-top:20px; background:none; border:none; color:var(--accent); cursor:pointer; font-size:13px; font-weight:bold;">BORRAR ESTA NOTA</button>
         </div>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">💾 TXT</button>
+        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:15px 20px; border-radius:15px; font-weight:bold; cursor:pointer;">💾 TXT</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size:11px; font-weight:bold; width:80px; color:#64748b; text-align:right;">LISTO</div>
+        <div id="st" style="font-size:12px; font-weight:900; width:80px; color:#64748b; text-align:right;">LISTO</div>
     </div>
 
     <script>
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v7_2')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v7_3')) || [];
         let editId = null;
         let silenceTimer;
+        let isRecording = false;
 
-        // --- LÓGICA DE VOZ v7.2 (SISTEMA DE RECONSTRUCCIÓN TOTAL) ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
@@ -87,49 +89,56 @@
 
             const btn = document.getElementById('btn');
             const preview = document.getElementById('live-preview');
-            let sessionText = ""; // Aquí guardamos el texto final de la sesión actual
+            const st = document.getElementById('st');
+            
+            let finalTranscript = ""; // Solo guarda lo confirmado
 
             btn.onclick = () => {
-                if (btn.classList.contains('recording')) { rec.stop(); return; }
-                sessionText = "";
+                if (isRecording) { rec.stop(); return; }
+                
+                // Reset de sesión
+                finalTranscript = "";
                 preview.innerText = "";
                 preview.style.display = "block";
                 btn.classList.add('recording');
-                document.getElementById('st').innerText = "ESCUCHANDO";
-                rec.start();
+                st.innerText = "GRABANDO";
+                isRecording = true;
+                
+                try { rec.start(); } catch(e) { console.error(e); }
             };
 
-            rec.onresult = (e) => {
-                let finalSegmentos = "";
-                let interimSegmentos = "";
-
-                // RECONSTRUCCIÓN: Recorremos todos los resultados acumulados en el objeto de evento
-                for (let i = 0; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) {
-                        finalSegmentos += e.results[i][0].transcript + " ";
+            rec.onresult = (event) => {
+                let interimTranscript = "";
+                
+                // CLAVE: Empezamos desde resultIndex para no repetir lo anterior
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + " ";
                     } else {
-                        interimSegmentos += e.results[i][0].transcript;
+                        interimTranscript += transcript;
                     }
                 }
                 
-                // Actualizamos la variable de sesión y la previsualización
-                sessionText = finalSegmentos;
-                preview.innerText = (finalSegmentos + interimSegmentos).trim();
+                // Mostrar en pantalla combinando lo final y lo que está procesando ahora
+                preview.innerText = (finalTranscript + interimTranscript).trim();
 
-                // Auto-guardado por silencio
+                // Reset de tiempo de espera (5 segundos de silencio para auto-guardar)
                 clearTimeout(silenceTimer);
-                silenceTimer = setTimeout(() => rec.stop(), 5000);
+                silenceTimer = setTimeout(() => { if(isRecording) rec.stop(); }, 5000);
             };
 
             rec.onend = () => {
+                isRecording = false;
                 btn.classList.remove('recording');
                 preview.style.display = "none";
-                document.getElementById('st').innerText = "LISTO";
+                st.innerText = "LISTO";
                 
-                if (sessionText.trim().length > 1) {
+                const textoFinal = finalTranscript.trim();
+                if (textoFinal.length > 2) {
                     const nueva = {
                         id: Date.now(),
-                        t: sessionText.trim(),
+                        t: textoFinal,
                         h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                         f: new Date().toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'})
                     };
@@ -137,18 +146,25 @@
                     saveAndRender();
                 }
             };
+
+            rec.onerror = (e) => {
+                console.error("Error:", e.error);
+                isRecording = false;
+                btn.classList.remove('recording');
+                st.innerText = "ERROR";
+            };
         }
 
-        // --- FUNCIONES DE LA APP ---
+        // --- FUNCIONES INTERFAZ ---
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
                 render();
-            } else { alert("PIN incorrecto"); }
+            } else { alert("Acceso denegado"); }
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_2', JSON.stringify(notas));
+            localStorage.setItem('notas_v7_3', JSON.stringify(notas));
             render();
         }
 
@@ -166,7 +182,8 @@
                 <div class="dia">
                     <div class="dia-h">${f}</div>
                     ${grupos[f].map(n => `<div class="nota" onclick="openEdit(${n.id})">
-                        <small style="opacity:0.5">${n.h}</small><br>${n.t}
+                        <div style="font-size:11px; color:var(--p); font-weight:bold; margin-bottom:5px;">${n.h}</div>
+                        <div style="line-height:1.4;">${n.t}</div>
                     </div>`).join('')}
                 </div>
             `).join('');
@@ -179,24 +196,26 @@
         }
 
         function saveEdit() {
-            notas.find(n => n.id === editId).t = document.getElementById('edit-texto').value;
+            const idx = notas.findIndex(n => n.id === editId);
+            notas[idx].t = document.getElementById('edit-texto').value;
             closeModal(); saveAndRender();
         }
 
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
         
         function deleteNote() {
-            if(confirm("¿Eliminar nota?")) {
+            if(confirm("¿Seguro que quieres borrar esta nota para siempre?")) {
                 notas = notas.filter(n => n.id !== editId);
                 closeModal(); saveAndRender();
             }
         }
 
         function exportarTodo() {
-            let txt = notas.map(n => `${n.f} ${n.h}\n${n.t}`).join('\n\n---\n\n');
+            let txt = "MIS NOTAS\n\n" + notas.map(n => `${n.f} ${n.h}\n${n.t}`).join('\n\n---\n\n');
+            const blob = new Blob([txt], {type:'text/plain'});
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain'}));
-            a.download = "diario.txt"; a.click();
+            a.href = URL.createObjectURL(blob);
+            a.download = "notas_escritor_pro.txt"; a.click();
         }
 
         setInterval(() => {
