@@ -3,55 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v7.9</title>
+    <title>Escritor Pro | v8.0</title>
     <style>
-        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; --active: #10b981; }
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; overflow-x: hidden; }
-        .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.4; z-index: 3000; font-weight: bold; }
-
-        /* PANTALLA ACCESO */
-        #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px; text-align: center; }
+        
+        /* LOGIN */
+        #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; }
         #hora-actual { font-size: 3.5em; font-family: monospace; font-weight: 200; margin-bottom: 5px; }
-        #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; }
-        .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
-        .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
+        #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; max-width: 80%; min-height: 40px; }
+        .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 220px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
+        .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; }
 
-        /* UI PRINCIPAL */
+        /* LISTA */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; max-width: 800px; margin: 0 auto; }
         .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; }
-        #lista { margin-top: 10px; max-width: 800px; margin: 10px auto; }
-        .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; border-radius: 15px 15px 0 0; }
+        #lista { max-width: 800px; margin: 10px auto; }
+        .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
+        .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; text-transform: uppercase; }
         .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.6; cursor: pointer; }
 
-        /* PANEL INFERIOR */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: center; align-items: center; gap: 20px; box-shadow: 0 -5px 10px rgba(0,0,0,0.02); }
-        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        /* PANEL */
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .btn-mic.waiting { background: #fbbf24; transform: scale(0.9); }
         .btn-mic.recording { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
         
-        #st { font-size: 12px; font-weight: bold; color: var(--p); width: 80px; text-align: center; }
+        #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid var(--p); display: none; z-index: 1000; text-align: center; font-weight: 500; }
 
-        #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; text-align: center; }
-
-        /* MODAL */
+        /* EDITOR */
         #editor-modal { display: none; position: fixed; inset: 0; background: white; z-index: 2500; flex-direction: column; padding: 20px; }
-        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.7; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 15px; border-radius: 10px; box-sizing: border-box; }
+        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.7; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v7.9</div>
+    <div style="position:fixed; top:10px; right:10px; font-size:10px; opacity:0.3; font-weight:bold; z-index:3000;">v8.0 FINAL</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-inicio">"Iniciando motor de voz..."</div>
+        <div id="frase-inicio">"Tu espacio de escritura..."</div>
         <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
         <button onclick="login()" class="auth-btn">ENTRAR</button>
-        <div style="margin-top:20px; font-size:0.7em; opacity:0.5">BUILD 7.9 | ZERO-LAG START</div>
+        <div style="margin-top:20px; font-size:0.7em; opacity:0.4;">BUILD 8.0 | STABLE EDITION</div>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar notas..." oninput="render()"></div>
     </div>
 
     <div id="lista"></div>
@@ -59,22 +57,23 @@
 
     <div id="editor-modal">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold; font-size:1.1em; cursor:pointer;">← Volver</button>
-            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 25px; border-radius:12px; font-weight:bold; cursor:pointer;">GUARDAR</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold;">← CANCELAR</button>
+            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">GUARDAR</button>
         </div>
         <textarea id="edit-texto"></textarea>
+        <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:20px; font-size:0.8em;">ELIMINAR ESTA NOTA</button>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 18px; border-radius:12px; font-weight:bold; color: #475569;">TXT</button>
+        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 15px; border-radius:12px; font-weight:bold; color:#475569;">TXT</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st">LISTO</div>
+        <div id="st" style="font-size:11px; font-weight:bold; width:60px; text-align:right; color:var(--p);">LISTO</div>
     </div>
 
     <script>
-        const FRASES = ["Tu voz es arte.", "Escribe con el alma.", "No pierdas ni una palabra."];
+        const FRASES = ["La escritura es la pintura de la voz.", "Captura tus ideas.", "Tu diario seguro."];
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v7_9')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v8_0')) || [];
         let editId = null;
         let isRecording = false;
 
@@ -84,8 +83,6 @@
             rec.lang = 'es-ES';
             rec.continuous = false;
             rec.interimResults = true;
-            // CLAVE: Activar máxima sensibilidad
-            rec.maxAlternatives = 1;
 
             const btn = document.getElementById('btn');
             const st = document.getElementById('st');
@@ -94,40 +91,19 @@
 
             btn.onclick = () => {
                 if (isRecording) { rec.stop(); return; }
-                
-                // Reset inmediato
                 tempText = "";
                 isRecording = true;
-                st.innerText = "CONECTANDO...";
-                btn.style.background = "#fbbf24"; // Color naranja mientras conecta
-                
-                try { 
-                    rec.start(); 
-                } catch(e) { 
-                    isRecording = false; 
-                    st.innerText = "ERROR";
-                    btn.style.background = "#cbd5e1";
-                }
+                btn.classList.add('waiting');
+                st.innerText = "ESPERA...";
+                rec.start();
             };
 
-            // SEÑAL AUDIBLE Y VISUAL CUANDO EL CANAL ESTÁ ABIERTO
             rec.onstart = () => {
+                btn.classList.remove('waiting');
                 btn.classList.add('recording');
-                st.innerText = "¡DILO YA!";
-                preview.innerText = "Escuchando...";
+                st.innerText = "HABLA";
                 preview.style.display = "block";
-                
-                // Pequeño sonido de "bip" para avisarte que el micro está activo (opcional)
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
+                preview.innerText = "...";
             };
 
             rec.onresult = (e) => {
@@ -141,8 +117,7 @@
 
             rec.onend = () => {
                 isRecording = false;
-                btn.classList.remove('recording');
-                btn.style.background = "#cbd5e1";
+                btn.classList.remove('recording', 'waiting');
                 st.innerText = "LISTO";
                 preview.style.display = "none";
                 
@@ -167,13 +142,15 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_9', JSON.stringify(notas));
+            localStorage.setItem('notas_v8_0', JSON.stringify(notas));
             render();
         }
 
         function render() {
             const cont = document.getElementById('lista');
-            const grupos = notas.reduce((acc, n) => {
+            const term = document.getElementById('busqueda').value.toLowerCase();
+            const filtradas = notas.filter(n => n.t.toLowerCase().includes(term));
+            const grupos = filtradas.reduce((acc, n) => {
                 if (!acc[n.f]) acc[n.f] = [];
                 acc[n.f].push(n); return acc;
             }, {});
@@ -182,7 +159,7 @@
                 <div class="dia">
                     <div class="dia-h">${f}</div>
                     ${grupos[f].map(n => `<div class="nota" onclick="openEdit(${n.id})">
-                        <small style="color:var(--p)">${n.h}</small><br>${n.t}
+                        <small style="color:var(--p); font-weight:bold;">${n.h}</small><br>${n.t}
                     </div>`).join('')}
                 </div>
             `).join('');
@@ -200,13 +177,25 @@
         }
 
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
+        
+        function deleteNote() {
+            if(confirm("¿Borrar?")) {
+                notas = notas.filter(n => n.id !== editId);
+                closeModal(); saveAndRender();
+            }
+        }
 
         function exportarTodo() {
-            let txt = notas.map(n => `${n.f} ${n.h}\n${n.t}`).join('\n\n');
+            if (!notas.length) return;
+            let txt = "DIARIO PROFESIONAL\n" + "=".repeat(20) + "\n\n";
+            notas.forEach(n => {
+                txt += `${n.f} [${n.h}]\n${n.t}\n${"-".repeat(15)}\n\n`;
+            });
             const blob = new Blob(["\ufeff", txt], { type: 'text/plain;charset=utf-8' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "diario.txt"; a.click();
+            a.download = `notas_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
         }
 
         setInterval(() => {
