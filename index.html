@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta property="og:title" content="Escritor Pro - Tu asistente de voz">
-    <meta property="og:description" content="Dictado profesional con privacidad 100% local.">
-    <title>Escritor Pro | v7.0</title>
+    <title>Escritor Pro | v7.1</title>
     <style>
         :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; --wait: #f59e0b; }
 
@@ -14,110 +12,83 @@
             background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 180px; 
         }
         
+        /* INDICADOR DE VERSIÓN */
+        .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.5; z-index: 3000; font-weight: bold; }
+
         /* PANTALLA DE ACCESO */
-        #auth { 
-            position: fixed; inset: 0; background: #0f172a; z-index: 2000; 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; color: white; 
-        }
-
+        #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
         #hora-actual { font-size: 3em; font-family: monospace; margin-bottom: 20px; font-weight: 200; }
-        #frase-motivadora { font-style: italic; color: #94a3b8; text-align: center; max-width: 80%; margin-bottom: 30px; font-size: 0.9em; min-height: 3em; }
-
-        .auth-input { 
-            padding: 18px; border-radius: 14px; border: 2px solid #334155; 
-            text-align: center; font-size: 24px; width: 220px; margin-bottom: 20px; 
-            background: #1e293b; color: white; outline: none;
-        }
-
+        .auth-input { padding: 18px; border-radius: 14px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 220px; margin-bottom: 20px; background: #1e293b; color: white; outline: none; }
         .auth-btn { padding: 16px 60px; background: var(--p); color: white; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; }
 
         /* UI PRINCIPAL */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
         .search-box input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; outline: none; }
-        
         .tag-menu { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .tag-pill { padding: 8px 16px; border-radius: 20px; background: white; border: 2px solid #eee; font-size: 0.8em; white-space: nowrap; cursor: pointer; font-weight: bold; }
         
-        /* LISTADO DE NOTAS */
         #lista { max-width: 700px; margin: 0 auto; }
         .dia { background: var(--card); border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden; }
         .dia-h { background: #f1f5f9; padding: 10px 15px; font-weight: bold; font-size: 0.8em; color: #64748b; text-transform: uppercase; }
-        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; border-left: 5px solid transparent; cursor: pointer; transition: 0.2s; }
-        .nota:hover { background: #fcfcfc; }
+        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; border-left: 5px solid transparent; cursor: pointer; }
         
-        /* EDITOR MODAL REFORZADO */
         #editor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; align-items: center; justify-content: center; padding: 15px; }
         .modal-content { background: white; width: 100%; max-width: 600px; padding: 20px; border-radius: 20px; box-sizing: border-box; }
         textarea { width: 100%; height: 250px; margin: 15px 0; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 18px; box-sizing: border-box; resize: none; font-family: serif; line-height: 1.6; }
 
-        /* PANEL INFERIOR (CONTROLES) */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
-        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 35px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
-        
-        /* ESTADOS DEL MICRÓFONO */
-        .btn-mic.pre-warm { background: var(--wait); transform: scale(0.9); }
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 35px; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
         .btn-mic.recording { background: var(--accent); animation: pulse 1.2s infinite; }
+        #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; text-align: center; color: var(--p); font-weight: bold; pointer-events: none; }
 
-        /* SUBTÍTULOS EN TIEMPO REAL */
-        #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; text-align: center; color: var(--p); font-weight: bold; font-style: italic; text-shadow: 0 0 10px white; pointer-events: none; }
-
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { transform: scale(1); } }
-
-        /* RESPONSIVE PORTÁTIL */
-        @media (min-width: 768px) {
-            .modal-content { max-width: 800px; }
-            textarea { height: 400px; font-size: 22px; }
-        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @media (min-width: 768px) { .modal-content { max-width: 800px; } textarea { height: 400px; } }
     </style>
 </head>
 <body>
 
+    <div class="version-tag">v7.1</div>
+
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-motivadora">"Tu historia merece ser contada."</div>
         <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
-        <button onclick="login()" class="auth-btn">DESBLOQUEAR</button>
+        <button onclick="login()" class="auth-btn">ENTRAR</button>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar en mis notas..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar..." oninput="render()"></div>
         <div class="tag-menu" id="tag-filters"></div>
     </div>
 
     <div id="lista"></div>
-
     <div id="live-preview"></div>
 
     <div id="editor-modal">
         <div class="modal-content">
             <textarea id="edit-texto"></textarea>
-            <div id="tag-options" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:8px;"></div>
+            <div id="tag-options" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;"></div>
             <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="saveEdit()" style="flex:2; padding:18px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">GUARDAR CAMBIOS</button>
-                <button onclick="closeModal()" style="flex:1; padding:18px; background:#f1f5f9; border:none; border-radius:12px; cursor:pointer;">CERRAR</button>
+                <button onclick="saveEdit()" style="flex:2; padding:18px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold;">GUARDAR</button>
+                <button onclick="closeModal()" style="flex:1; padding:18px; background:#f1f5f9; border:none; border-radius:12px;">X</button>
             </div>
-            <button onclick="deleteNote()" style="width:100%; margin-top:15px; padding:10px; background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.8em;">Eliminar nota definitivamente</button>
+            <button onclick="deleteNote()" style="width:100%; margin-top:15px; background:none; border:none; color:var(--accent); cursor:pointer;">Eliminar nota</button>
         </div>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; cursor:pointer;">💾 TXT</button>
+        <button onclick="exportarTodo()" style="background:#10b981; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">💾 TXT</button>
         <button id="btn" class="btn-mic">🎤</button>
         <div id="st" style="font-size:11px; font-weight:bold; width:80px; color:#64748b; text-align:right;">LISTO</div>
     </div>
 
     <script>
         const PIN_CORRECTO = "1234";
-        const FRASES = ["Escribir es la pintura de la voz.", "La pluma es la lengua del alma.", "Tu historia solo la puedes contar tú.", "Cada frase cuenta.", "El secreto está en empezar.", "La magia ocurre cuando escribes."];
-
-        let notas = JSON.parse(localStorage.getItem('notas_v7_0')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v7_1')) || [];
         let editId = null;
         let tempTagId = null;
         let filtroTag = "";
         let silenceTimer;
 
-        // ETIQUETAS
         const ETIQUETAS = [
             { id: 't1', nombre: 'Capítulo', color: '#6366f1' },
             { id: 't2', nombre: 'Personaje', color: '#10b981' },
@@ -125,61 +96,62 @@
             { id: 't4', nombre: 'Revisar', color: '#ef4444' }
         ];
 
-        // --- LÓGICA DE VOZ (MEJORADA) ---
+        // --- VOZ v7.1 (SIN REPETICIONES) ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'es-ES';
-            rec.continuous = true; 
-            rec.interimResults = true; // ACTIVADO: Ver texto mientras hablas
+            rec.continuous = true;
+            rec.interimResults = true;
 
             const btn = document.getElementById('btn');
             const st = document.getElementById('st');
             const preview = document.getElementById('live-preview');
-            let acumulado = "";
+            
+            // Usamos un Set para evitar duplicados de fragmentos finales
+            let transcripcionFinal = ""; 
 
             btn.onclick = () => {
-                if (btn.classList.contains('recording') || btn.classList.contains('pre-warm')) {
-                    rec.stop(); return;
-                }
-                acumulado = "";
+                if (btn.classList.contains('recording')) { rec.stop(); return; }
+                transcripcionFinal = "";
                 preview.innerText = "";
-                btn.classList.add('pre-warm');
-                st.innerText = "CONECTANDO...";
+                btn.classList.add('recording');
+                st.innerText = "ESCUCHANDO";
                 rec.start();
             };
 
-            rec.onstart = () => {
-                btn.classList.remove('pre-warm');
-                btn.classList.add('recording');
-                st.innerText = "ESCUCHANDO";
-            };
-
             rec.onresult = (e) => {
-                let intermedio = "";
+                let interimTranscript = '';
+                let resultActual = '';
+
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    const texto = e.results[i][0].transcript;
                     if (e.results[i].isFinal) {
-                        acumulado += e.results[i][0].transcript + " ";
+                        resultActual += texto + " ";
                     } else {
-                        intermedio += e.results[i][0].transcript;
+                        interimTranscript += texto;
                     }
                 }
-                // Mostrar "subtítulos" en tiempo real
-                preview.innerText = intermedio || acumulado;
+                
+                // Solo añadimos si es un resultado nuevo
+                if (resultActual) transcripcionFinal += resultActual;
+                
+                // Mostrar en pantalla (Limpiamos espacios dobles)
+                preview.innerText = (transcripcionFinal + interimTranscript).replace(/\s+/g, ' ');
 
-                // Reiniciar temporizador de silencio (4 seg)
                 clearTimeout(silenceTimer);
-                silenceTimer = setTimeout(() => {
-                    if(btn.classList.contains('recording') && acumulado.length > 0) rec.stop();
-                }, 4000);
+                silenceTimer = setTimeout(() => rec.stop(), 4000);
             };
 
             rec.onend = () => {
                 btn.className = 'btn-mic';
                 preview.innerText = "";
-                if (acumulado.trim().length > 1) {
+                if (transcripcionFinal.trim().length > 1) {
+                    // Limpieza final de palabras repetidas pegadas (ej: "hola hola")
+                    const textoLimpio = transcripcionFinal.trim().replace(/\b(\w+)\s+\1\b/gi, '$1');
+                    
                     const nueva = {
-                        id: Date.now(), t: acumulado.trim(), tagId: null,
+                        id: Date.now(), t: textoLimpio, tagId: null,
                         h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                         f: new Date().toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'})
                     };
@@ -187,26 +159,18 @@
                     saveAndRender();
                     st.innerText = "GUARDADO";
                 } else { st.innerText = "LISTO"; }
-                setTimeout(() => st.innerText = "LISTO", 2000);
             };
-
-            rec.onerror = (err) => {
-                console.error(err);
-                btn.className = 'btn-mic';
-                st.innerText = "ERROR MIC";
-            }
         }
 
-        // --- FUNCIONES CORE ---
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
                 render();
-            } else { alert("PIN Incorrecto"); }
+            } else { alert("Error"); }
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_0', JSON.stringify(notas));
+            localStorage.setItem('notas_v7_1', JSON.stringify(notas));
             render();
         }
 
@@ -214,9 +178,8 @@
             const cont = document.getElementById('lista');
             const term = document.getElementById('busqueda').value.toLowerCase();
             
-            // Render Filtros
-            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill" style="background:${filtroTag===''?'#eee':'white'}" onclick="filtrar('')">Todas</div>` + 
-                ETIQUETAS.map(t => `<div class="tag-pill" style="border-color:${t.color}; color:${t.color}; background:${filtroTag===t.id?t.color+'20':'white'}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
+            document.getElementById('tag-filters').innerHTML = `<div class="tag-pill" onclick="filtrar('')">Todas</div>` + 
+                ETIQUETAS.map(t => `<div class="tag-pill" style="color:${t.color}" onclick="filtrar('${t.id}')">${t.nombre}</div>`).join('');
 
             const filtradas = notas.filter(n => (filtroTag === "" || n.tagId === filtroTag) && n.t.toLowerCase().includes(term));
             const grupos = filtradas.reduce((acc, n) => {
@@ -227,14 +190,12 @@
             cont.innerHTML = Object.keys(grupos).map(f => `
                 <div class="dia">
                     <div class="dia-h">${f}</div>
-                    ${grupos[f].map(n => {
-                        const tag = ETIQUETAS.find(t => t.id === n.tagId);
-                        return `
-                        <div class="nota" style="border-left-color:${tag?tag.color:'transparent'}" onclick="openEdit(${n.id})">
-                            <div style="font-size:0.7em; color:#94a3b8; margin-bottom:5px;">${n.h} ${tag?' | <b>'+tag.nombre.toUpperCase()+'</b>':''}</div>
-                            <div style="line-height:1.5;">${n.t}</div>
-                        </div>`;
-                    }).join('')}
+                    ${grupos[f].map(n => `
+                        <div class="nota" onclick="openEdit(${n.id})">
+                            <div style="font-size:10px; opacity:0.5;">${n.h}</div>
+                            <div>${n.t}</div>
+                        </div>
+                    `).join('')}
                 </div>
             `).join('');
         }
@@ -242,33 +203,17 @@
         function openEdit(id) {
             editId = id; const nota = notas.find(n => n.id === id);
             document.getElementById('edit-texto').value = nota.t;
-            tempTagId = nota.tagId;
-            
-            document.getElementById('tag-options').innerHTML = ETIQUETAS.map(t => `
-                <div onclick="tempTagId='${t.id}'; actualizarUIEtiquetas();" 
-                     class="tag-opt" id="opt-${t.id}"
-                     style="padding:12px; border:2px solid ${t.color}; border-radius:10px; cursor:pointer; font-size:12px; text-align:center; transition:0.2s; ${tempTagId===t.id?'background:'+t.color+';color:white;':''}">
-                     ${t.nombre}
-                </div>
-            `).join('') + `<div onclick="tempTagId=null; actualizarUIEtiquetas();" style="padding:12px; border:2px solid #ccc; border-radius:10px; text-align:center; font-size:12px; cursor:pointer;">Ninguna</div>`;
-            
             document.getElementById('editor-modal').style.display = 'flex';
-        }
-
-        function actualizarUIEtiquetas() {
-            // Solo para refrescar visualmente la selección en el modal
-            openEdit(editId); 
         }
 
         function saveEdit() {
             const idx = notas.findIndex(n => n.id === editId);
             notas[idx].t = document.getElementById('edit-texto').value;
-            notas[idx].tagId = tempTagId;
             closeModal(); saveAndRender();
         }
 
         function deleteNote() {
-            if(confirm("¿Seguro que quieres borrar esta nota?")) {
+            if(confirm("¿Borrar?")) {
                 notas = notas.filter(n => n.id !== editId);
                 closeModal(); saveAndRender();
             }
@@ -278,23 +223,16 @@
         function filtrar(id) { filtroTag = id; render(); }
         
         function exportarTodo() {
-            let texto = "MI DIARIO / LIBRO\n\n";
-            notas.forEach(n => { texto += `[${n.f} ${n.h}]\n${n.t}\n\n---\n\n`; });
+            let texto = notas.map(n => `[${n.f} ${n.h}]\n${n.t}`).join('\n\n---\n\n');
             const blob = new Blob([texto], {type:'text/plain'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "manuscrito.txt"; a.click();
+            a.download = "diario.txt"; a.click();
         }
 
-        // Reloj de entrada
         setInterval(() => {
-            const ahora = new Date();
-            document.getElementById('hora-actual').innerText = ahora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('hora-actual').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         }, 1000);
-
-        window.onload = () => {
-            document.getElementById('frase-motivadora').innerText = `"${FRASES[Math.floor(Math.random() * FRASES.length)]}"`;
-        };
     </script>
 </body>
 </html>
