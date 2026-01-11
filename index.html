@@ -3,131 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v7.7</title>
+    <title>Escritor Pro | v7.8</title>
     <style>
-        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
+        :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; --active: #10b981; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; overflow-x: hidden; }
-        
         .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.4; z-index: 3000; font-weight: bold; }
 
         /* PANTALLA ACCESO */
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px; text-align: center; }
-        #hora-actual { font-size: clamp(2em, 10vw, 3.5em); font-family: monospace; font-weight: 200; margin-bottom: 5px; }
-        #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; max-width: 80%; }
+        #hora-actual { font-size: 3.5em; font-family: monospace; font-weight: 200; margin-bottom: 5px; }
+        #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; }
         .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
-        .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: transform 0.2s; }
-        .auth-btn:active { transform: scale(0.95); }
+        .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
         .login-version { margin-top: 20px; font-size: 0.7em; color: #475569; letter-spacing: 1px; }
 
-        /* UI PRINCIPAL */
+        /* LISTA Y BUSCADOR */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; max-width: 800px; margin: 0 auto; }
         .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; }
-        
         #lista { margin-top: 10px; max-width: 800px; margin: 10px auto; }
-        .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; text-transform: uppercase; }
-        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.6; cursor: pointer; transition: background 0.2s; }
-        .nota:hover { background: #fcfcfc; }
+        .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; border-radius: 15px 15px 0 0; }
+        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.6; cursor: pointer; }
 
         /* EDITOR */
         #editor-modal { display: none; position: fixed; inset: 0; background: white; z-index: 2500; flex-direction: column; padding: 20px; }
-        .editor-container { max-width: 800px; margin: 0 auto; width: 100%; height: 100%; display: flex; flex-direction: column; }
         textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.7; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 15px; border-radius: 10px; box-sizing: border-box; }
 
         /* PANEL INFERIOR */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: center; align-items: center; gap: 20px; }
-        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(99,102,241,0.4); cursor: pointer; z-index: 10; -webkit-tap-highlight-color: transparent; }
-        .btn-mic.recording { background: var(--accent); animation: pulse 1s infinite; }
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: center; align-items: center; gap: 20px; box-shadow: 0 -5px 10px rgba(0,0,0,0.02); }
+        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
         
-        .btn-side { background: #f1f5f9; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #475569; cursor: pointer; font-size: 0.8em; }
+        /* Estado: Preparando */
+        .btn-mic.preparing { background: var(--active); transform: scale(0.9); }
+        /* Estado: Escuchando realmente */
+        .btn-mic.recording { background: var(--accent); transform: scale(1.1); animation: pulse 1s infinite; }
+        
+        .btn-side { background: #f1f5f9; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #475569; cursor: pointer; }
 
-        #live-preview { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; text-align: center; }
+        #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; text-align: center; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.4); } 100% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v7.7</div>
+    <div class="version-tag">v7.8</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-inicio">"Tu historia empieza aquí..."</div>
-        <input type="password" id="pin" class="auth-input" placeholder="Introduce PIN" inputmode="numeric">
+        <div id="frase-inicio">"Cargando tus historias..."</div>
+        <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
         <button onclick="login()" class="auth-btn">ENTRAR</button>
-        <div class="login-version">BUILD VERSION 7.7 | HYBRID PC/MOBILE</div>
+        <div class="login-version">v7.8 | FAST-START ENGINE</div>
     </div>
 
     <div class="header-controls">
-        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar en mis escritos..." oninput="render()"></div>
+        <div class="search-box"><input type="text" id="busqueda" placeholder="🔍 Buscar..." oninput="render()"></div>
     </div>
 
     <div id="lista"></div>
     <div id="live-preview"></div>
 
     <div id="editor-modal">
-        <div class="editor-container">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold; font-size:1.1em; cursor:pointer;">← Volver</button>
-                <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 25px; border-radius:12px; font-weight:bold; cursor:pointer;">GUARDAR</button>
-            </div>
-            <textarea id="edit-texto" placeholder="Escribe aquí..."></textarea>
-            <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:20px; font-size:0.9em; font-weight: 500; cursor:pointer;">ELIMINAR NOTA</button>
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold; font-size:1.1em; cursor:pointer;">← Volver</button>
+            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 25px; border-radius:12px; font-weight:bold; cursor:pointer;">GUARDAR</button>
         </div>
+        <textarea id="edit-texto"></textarea>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" class="btn-side">EXPORTAR</button>
-        <button id="btn" class="btn-mic" title="Click para grabar">🎤</button>
-        <div id="st" style="font-size:10px; font-weight:bold; width:60px; opacity:0.4;">LISTO</div>
+        <button onclick="exportarTodo()" class="btn-side">TXT</button>
+        <button id="btn" class="btn-mic">🎤</button>
+        <div id="st" style="font-size:10px; font-weight:bold; width:60px; text-align:right; color:var(--p);">LISTO</div>
     </div>
 
     <script>
-        const FRASES = [
-            "La mejor forma de predecir el futuro es escribirlo.",
-            "Tu historia es única, cuéntala hoy.",
-            "Escribir es ordenar el caos de la mente.",
-            "Cada palabra es un paso hacia tu libro.",
-            "No esperes la inspiración, búscala con tu voz.",
-            "El papel es más paciente que los hombres."
-        ];
-        
+        const FRASES = ["Escribe tu futuro.", "Tu voz tiene poder.", "Captura el momento.", "Ordena tu mente."];
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v7_7')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v7_8')) || [];
         let editId = null;
         let isRecording = false;
 
-        // --- MOTOR DE VOZ (MEJORADO PARA PC Y MÓVIL) ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'es-ES';
-            rec.continuous = false; 
+            rec.continuous = false;
             rec.interimResults = true;
 
             const btn = document.getElementById('btn');
+            const st = document.getElementById('st');
             const preview = document.getElementById('live-preview');
             let tempText = "";
 
-            // Manejador único de acción (Click o Touch)
-            function toggleMic() {
-                if (isRecording) { 
-                    rec.stop(); 
-                } else {
-                    tempText = "";
-                    preview.innerText = "...";
-                    preview.style.display = "block";
-                    btn.classList.add('recording');
-                    isRecording = true;
-                    try { rec.start(); } catch(e) { console.error(e); }
-                }
-            }
+            btn.onclick = () => {
+                if (isRecording) { rec.stop(); return; }
+                
+                // PASO 1: Preparando (Cambio de color inmediato)
+                btn.classList.add('preparing');
+                st.innerText = "ESPERA...";
+                isRecording = true;
+                
+                try { rec.start(); } catch(e) { isRecording = false; btn.classList.remove('preparing'); }
+            };
 
-            // Eventos para máxima compatibilidad
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleMic();
-            });
+            // PASO 2: El micrófono ya está abierto de verdad
+            rec.onstart = () => {
+                btn.classList.remove('preparing');
+                btn.classList.add('recording');
+                st.innerText = "¡HABLA YA!";
+                preview.innerText = "Escuchando...";
+                preview.style.display = "block";
+                
+                // Feedback háptico (vibración corta si el móvil lo permite)
+                if (navigator.vibrate) navigator.vibrate(50);
+            };
 
             rec.onresult = (e) => {
                 let current = "";
@@ -140,14 +131,14 @@
 
             rec.onend = () => {
                 isRecording = false;
-                btn.classList.remove('recording');
+                btn.classList.remove('recording', 'preparing');
+                st.innerText = "LISTO";
                 preview.style.display = "none";
                 
                 if (tempText.trim().length > 1) {
-                    const limpio = tempText.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, "");
                     const nueva = {
                         id: Date.now(),
-                        t: limpio,
+                        t: tempText.trim(),
                         h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                         f: new Date().toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'})
                     };
@@ -155,15 +146,8 @@
                     saveAndRender();
                 }
             };
-
-            rec.onerror = () => {
-                isRecording = false;
-                btn.classList.remove('recording');
-                preview.style.display = "none";
-            };
         }
 
-        // --- LÓGICA APP ---
         function login() {
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
@@ -172,29 +156,25 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_7', JSON.stringify(notas));
+            localStorage.setItem('notas_v7_8', JSON.stringify(notas));
             render();
         }
 
         function render() {
             const cont = document.getElementById('lista');
-            const term = document.getElementById('busqueda').value.toLowerCase();
-            const filtradas = notas.filter(n => n.t.toLowerCase().includes(term));
-            
-            const grupos = filtradas.reduce((acc, n) => {
+            const grupos = notas.reduce((acc, n) => {
                 if (!acc[n.f]) acc[n.f] = [];
                 acc[n.f].push(n); return acc;
             }, {});
 
-            cont.innerHTML = Object.keys(grupos).length ? Object.keys(grupos).map(f => `
+            cont.innerHTML = Object.keys(grupos).map(f => `
                 <div class="dia">
                     <div class="dia-h">${f}</div>
                     ${grupos[f].map(n => `<div class="nota" onclick="openEdit(${n.id})">
-                        <div style="font-size:11px; color:var(--p); font-weight:bold; margin-bottom:5px;">${n.h}</div>
-                        ${n.t}
+                        <small style="color:var(--p)">${n.h}</small><br>${n.t}
                     </div>`).join('')}
                 </div>
-            `).join('') : '<div style="text-align:center; opacity:0.3; margin-top:50px;">Escribe tu primera nota</div>';
+            `).join('');
         }
 
         function openEdit(id) {
@@ -204,31 +184,18 @@
         }
 
         function saveEdit() {
-            const idx = notas.findIndex(n => n.id === editId);
-            notas[idx].t = document.getElementById('edit-texto').value.trim();
+            notas.find(n => n.id === editId).t = document.getElementById('edit-texto').value.trim();
             closeModal(); saveAndRender();
         }
 
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
-        
-        function deleteNote() {
-            if(confirm("¿Eliminar nota?")) {
-                notas = notas.filter(n => n.id !== editId);
-                closeModal(); saveAndRender();
-            }
-        }
 
         function exportarTodo() {
-            if (notas.length === 0) return alert("No hay notas");
-            let txt = "MI DIARIO PERSONAL\r\n" + "=".repeat(20) + "\r\n\r\n";
-            notas.forEach(n => {
-                txt += `[${n.f} - ${n.h}]\r\n${n.t}\r\n${"-".repeat(15)}\r\n\r\n`;
-            });
+            let txt = notas.map(n => `${n.f} ${n.h}\n${n.t}`).join('\n\n');
             const blob = new Blob(["\ufeff", txt], { type: 'text/plain;charset=utf-8' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `diario_${new Date().toISOString().slice(0,10)}.txt`;
-            a.click();
+            a.download = "diario.txt"; a.click();
         }
 
         setInterval(() => {
@@ -237,8 +204,7 @@
         }, 1000);
 
         window.onload = () => {
-            const f = FRASES[Math.floor(Math.random()*FRASES.length)];
-            document.getElementById('frase-inicio').innerText = `"${f}"`;
+            document.getElementById('frase-inicio').innerText = `"${FRASES[Math.floor(Math.random()*FRASES.length)]}"`;
         };
     </script>
 </body>
