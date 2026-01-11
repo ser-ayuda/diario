@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v7.8</title>
+    <title>Escritor Pro | v7.9</title>
     <style>
         :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; --active: #10b981; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; overflow-x: hidden; }
@@ -15,9 +15,8 @@
         #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; }
         .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
         .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
-        .login-version { margin-top: 20px; font-size: 0.7em; color: #475569; letter-spacing: 1px; }
 
-        /* LISTA Y BUSCADOR */
+        /* UI PRINCIPAL */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; max-width: 800px; margin: 0 auto; }
         .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; }
         #lista { margin-top: 10px; max-width: 800px; margin: 10px auto; }
@@ -25,36 +24,30 @@
         .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; border-radius: 15px 15px 0 0; }
         .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.6; cursor: pointer; }
 
-        /* EDITOR */
-        #editor-modal { display: none; position: fixed; inset: 0; background: white; z-index: 2500; flex-direction: column; padding: 20px; }
-        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.7; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 15px; border-radius: 10px; box-sizing: border-box; }
-
         /* PANEL INFERIOR */
         .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: center; align-items: center; gap: 20px; box-shadow: 0 -5px 10px rgba(0,0,0,0.02); }
-        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .btn-mic.recording { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
         
-        /* Estado: Preparando */
-        .btn-mic.preparing { background: var(--active); transform: scale(0.9); }
-        /* Estado: Escuchando realmente */
-        .btn-mic.recording { background: var(--accent); transform: scale(1.1); animation: pulse 1s infinite; }
-        
-        .btn-side { background: #f1f5f9; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; color: #475569; cursor: pointer; }
+        #st { font-size: 12px; font-weight: bold; color: var(--p); width: 80px; text-align: center; }
 
         #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; text-align: center; }
 
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.4); } 100% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } }
+        /* MODAL */
+        #editor-modal { display: none; position: fixed; inset: 0; background: white; z-index: 2500; flex-direction: column; padding: 20px; }
+        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.7; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 15px; border-radius: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v7.8</div>
+    <div class="version-tag">v7.9</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-inicio">"Cargando tus historias..."</div>
+        <div id="frase-inicio">"Iniciando motor de voz..."</div>
         <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
         <button onclick="login()" class="auth-btn">ENTRAR</button>
-        <div class="login-version">v7.8 | FAST-START ENGINE</div>
+        <div style="margin-top:20px; font-size:0.7em; opacity:0.5">BUILD 7.9 | ZERO-LAG START</div>
     </div>
 
     <div class="header-controls">
@@ -73,15 +66,15 @@
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" class="btn-side">TXT</button>
+        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 18px; border-radius:12px; font-weight:bold; color: #475569;">TXT</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size:10px; font-weight:bold; width:60px; text-align:right; color:var(--p);">LISTO</div>
+        <div id="st">LISTO</div>
     </div>
 
     <script>
-        const FRASES = ["Escribe tu futuro.", "Tu voz tiene poder.", "Captura el momento.", "Ordena tu mente."];
+        const FRASES = ["Tu voz es arte.", "Escribe con el alma.", "No pierdas ni una palabra."];
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v7_8')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v7_9')) || [];
         let editId = null;
         let isRecording = false;
 
@@ -91,6 +84,8 @@
             rec.lang = 'es-ES';
             rec.continuous = false;
             rec.interimResults = true;
+            // CLAVE: Activar máxima sensibilidad
+            rec.maxAlternatives = 1;
 
             const btn = document.getElementById('btn');
             const st = document.getElementById('st');
@@ -100,24 +95,39 @@
             btn.onclick = () => {
                 if (isRecording) { rec.stop(); return; }
                 
-                // PASO 1: Preparando (Cambio de color inmediato)
-                btn.classList.add('preparing');
-                st.innerText = "ESPERA...";
+                // Reset inmediato
+                tempText = "";
                 isRecording = true;
+                st.innerText = "CONECTANDO...";
+                btn.style.background = "#fbbf24"; // Color naranja mientras conecta
                 
-                try { rec.start(); } catch(e) { isRecording = false; btn.classList.remove('preparing'); }
+                try { 
+                    rec.start(); 
+                } catch(e) { 
+                    isRecording = false; 
+                    st.innerText = "ERROR";
+                    btn.style.background = "#cbd5e1";
+                }
             };
 
-            // PASO 2: El micrófono ya está abierto de verdad
+            // SEÑAL AUDIBLE Y VISUAL CUANDO EL CANAL ESTÁ ABIERTO
             rec.onstart = () => {
-                btn.classList.remove('preparing');
                 btn.classList.add('recording');
-                st.innerText = "¡HABLA YA!";
+                st.innerText = "¡DILO YA!";
                 preview.innerText = "Escuchando...";
                 preview.style.display = "block";
                 
-                // Feedback háptico (vibración corta si el móvil lo permite)
-                if (navigator.vibrate) navigator.vibrate(50);
+                // Pequeño sonido de "bip" para avisarte que el micro está activo (opcional)
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
             };
 
             rec.onresult = (e) => {
@@ -131,7 +141,8 @@
 
             rec.onend = () => {
                 isRecording = false;
-                btn.classList.remove('recording', 'preparing');
+                btn.classList.remove('recording');
+                btn.style.background = "#cbd5e1";
                 st.innerText = "LISTO";
                 preview.style.display = "none";
                 
@@ -156,7 +167,7 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_8', JSON.stringify(notas));
+            localStorage.setItem('notas_v7_9', JSON.stringify(notas));
             render();
         }
 
