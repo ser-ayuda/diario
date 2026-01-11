@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v8.0</title>
+    <title>Escritor Pro | v8.1</title>
     <style>
         :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; overflow-x: hidden; }
@@ -15,20 +15,22 @@
         .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 220px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
         .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; }
 
-        /* LISTA */
+        /* BUSCADOR */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; max-width: 800px; margin: 0 auto; }
         .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; }
+        
         #lista { max-width: 800px; margin: 10px auto; }
         .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
         .dia-h { background: #f1f5f9; padding: 10px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; text-transform: uppercase; }
         .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.6; cursor: pointer; }
 
-        /* PANEL */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .btn-mic { width: 80px; height: 80px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .btn-mic.waiting { background: #fbbf24; transform: scale(0.9); }
-        .btn-mic.recording { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+        /* PANEL INFERIOR (BOTÓN GRANDE) */
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: center; align-items: center; gap: 30px; }
+        .btn-mic { width: 85px; height: 85px; border-radius: 50%; border: none; background: #cbd5e1; color: white; font-size: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .btn-mic.recording { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 25px rgba(239, 68, 68, 0.4); }
         
+        #st { font-size: 12px; font-weight: bold; color: var(--p); width: 80px; text-align: center; }
+
         #live-preview { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid var(--p); display: none; z-index: 1000; text-align: center; font-weight: 500; }
 
         /* EDITOR */
@@ -38,14 +40,14 @@
 </head>
 <body>
 
-    <div style="position:fixed; top:10px; right:10px; font-size:10px; opacity:0.3; font-weight:bold; z-index:3000;">v8.0 FINAL</div>
+    <div style="position:fixed; top:10px; right:10px; font-size:10px; opacity:0.3; font-weight:bold; z-index:3000;">v8.1 (v7.9 Logic)</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-inicio">"Tu espacio de escritura..."</div>
+        <div id="frase-inicio">"Volviendo a la versión estable..."</div>
         <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
         <button onclick="login()" class="auth-btn">ENTRAR</button>
-        <div style="margin-top:20px; font-size:0.7em; opacity:0.4;">BUILD 8.0 | STABLE EDITION</div>
+        <div style="margin-top:20px; font-size:0.7em; opacity:0.5">BUILD 8.1 | ZERO-LAG RESTORED</div>
     </div>
 
     <div class="header-controls">
@@ -57,23 +59,22 @@
 
     <div id="editor-modal">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold;">← CANCELAR</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold;">← VOLVER</button>
             <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">GUARDAR</button>
         </div>
         <textarea id="edit-texto"></textarea>
-        <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:20px; font-size:0.8em;">ELIMINAR ESTA NOTA</button>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 15px; border-radius:12px; font-weight:bold; color:#475569;">TXT</button>
+        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 18px; border-radius:12px; font-weight:bold; color:#475569;">TXT</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size:11px; font-weight:bold; width:60px; text-align:right; color:var(--p);">LISTO</div>
+        <div id="st">LISTO</div>
     </div>
 
     <script>
-        const FRASES = ["La escritura es la pintura de la voz.", "Captura tus ideas.", "Tu diario seguro."];
+        const FRASES = ["La escritura es la pintura de la voz.", "Tu historia es importante.", "Captura el momento."];
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v8_0')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v8_1')) || [];
         let editId = null;
         let isRecording = false;
 
@@ -83,6 +84,7 @@
             rec.lang = 'es-ES';
             rec.continuous = false;
             rec.interimResults = true;
+            rec.maxAlternatives = 1;
 
             const btn = document.getElementById('btn');
             const st = document.getElementById('st');
@@ -93,17 +95,17 @@
                 if (isRecording) { rec.stop(); return; }
                 tempText = "";
                 isRecording = true;
-                btn.classList.add('waiting');
-                st.innerText = "ESPERA...";
-                rec.start();
+                st.innerText = "CONECTANDO...";
+                btn.style.background = "#fbbf24"; // Naranja preventivo
+                try { rec.start(); } catch(e) { isRecording = false; }
             };
 
             rec.onstart = () => {
-                btn.classList.remove('waiting');
                 btn.classList.add('recording');
-                st.innerText = "HABLA";
+                btn.style.background = ""; // Vuelve al CSS (Rojo accent)
+                st.innerText = "¡DILO YA!";
+                preview.innerText = "Escuchando...";
                 preview.style.display = "block";
-                preview.innerText = "...";
             };
 
             rec.onresult = (e) => {
@@ -117,7 +119,8 @@
 
             rec.onend = () => {
                 isRecording = false;
-                btn.classList.remove('recording', 'waiting');
+                btn.classList.remove('recording');
+                btn.style.background = "#cbd5e1";
                 st.innerText = "LISTO";
                 preview.style.display = "none";
                 
@@ -142,7 +145,7 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v8_0', JSON.stringify(notas));
+            localStorage.setItem('notas_v8_1', JSON.stringify(notas));
             render();
         }
 
@@ -177,25 +180,13 @@
         }
 
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
-        
-        function deleteNote() {
-            if(confirm("¿Borrar?")) {
-                notas = notas.filter(n => n.id !== editId);
-                closeModal(); saveAndRender();
-            }
-        }
 
         function exportarTodo() {
-            if (!notas.length) return;
-            let txt = "DIARIO PROFESIONAL\n" + "=".repeat(20) + "\n\n";
-            notas.forEach(n => {
-                txt += `${n.f} [${n.h}]\n${n.t}\n${"-".repeat(15)}\n\n`;
-            });
+            let txt = notas.map(n => `${n.f} [${n.h}]\n${n.t}`).join('\n\n---\n\n');
             const blob = new Blob(["\ufeff", txt], { type: 'text/plain;charset=utf-8' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `notas_${new Date().toISOString().slice(0,10)}.txt`;
-            a.click();
+            a.download = "diario.txt"; a.click();
         }
 
         setInterval(() => {
