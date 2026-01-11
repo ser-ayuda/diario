@@ -3,52 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Escritor Pro | v7.4</title>
+    <title>Escritor Pro | v7.5</title>
     <style>
         :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; --accent: #ef4444; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 10px; padding-bottom: 160px; overflow-x: hidden; }
-        
         .version-tag { position: fixed; top: 10px; right: 10px; font-size: 10px; opacity: 0.4; z-index: 3000; }
 
-        /* PANTALLA ACCESO REFORMADA */
+        /* PANTALLA ACCESO */
         #auth { position: fixed; inset: 0; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px; text-align: center; }
         #hora-actual { font-size: 3.5em; font-family: monospace; font-weight: 200; margin-bottom: 10px; }
         #frase-inicio { font-style: italic; color: #94a3b8; margin-bottom: 30px; font-size: 0.9em; min-height: 40px; }
-        .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; }
+        .auth-input { padding: 18px; border-radius: 16px; border: 2px solid #334155; text-align: center; font-size: 24px; width: 80%; max-width: 250px; background: #1e293b; color: white; margin-bottom: 20px; outline: none; }
         .auth-btn { padding: 18px 50px; background: var(--p); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 1.1em; }
 
         /* BUSCADOR Y LISTA */
         .header-controls { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px 0; }
-        .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; }
+        .search-box input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; font-size: 16px; outline: none; }
         
         #lista { margin-top: 10px; }
         .dia { background: var(--card); border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        .dia-h { background: #f1f5f9; padding: 8px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; }
-        .nota { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.5; }
+        .dia-h { background: #f1f5f9; padding: 8px 15px; font-size: 0.75em; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .nota { padding: 18px; border-bottom: 1px solid #f1f5f9; font-size: 1.05em; line-height: 1.5; cursor: pointer; }
+        .nota:active { background: #f8fafc; }
 
-        /* EDITOR MOVIL */
+        /* EDITOR PANTALLA COMPLETA */
         #editor-modal { display: none; position: fixed; inset: 0; background: white; z-index: 2500; flex-direction: column; padding: 20px; }
-        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.6; outline: none; resize: none; font-family: serif; background: #fffcf5; padding: 10px; border-radius: 10px; }
+        textarea { flex-grow: 1; width: 100%; border: none; font-size: 1.2em; line-height: 1.6; outline: none; resize: none; font-family: serif; background: #fffdfa; padding: 10px; border-radius: 10px; }
 
         /* PANEL INFERIOR */
-        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(99,102,241,0.3); }
+        .panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -5px 15px rgba(0,0,0,0.02); }
+        .btn-mic { width: 75px; height: 75px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(99,102,241,0.4); }
         .btn-mic.recording { background: var(--accent); animation: pulse 1s infinite; }
         
-        #live-preview { position: fixed; bottom: 110px; left: 10px; right: 10px; background: rgba(255,255,255,0.98); padding: 15px; border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; max-height: 100px; overflow-y: auto; }
+        #live-preview { position: fixed; bottom: 110px; left: 15px; right: 15px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 2px solid var(--p); font-weight: 500; display: none; z-index: 1000; text-align: center; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v7.4 ANDROID FIX</div>
+    <div class="version-tag">v7.5 (Clear Export)</div>
 
     <div id="auth">
         <div id="hora-actual">00:00</div>
-        <div id="frase-inicio">"Cargando inspiración..."</div>
+        <div id="frase-inicio">"Cargando..."</div>
         <input type="password" id="pin" class="auth-input" placeholder="PIN" inputmode="numeric">
-        <button onclick="login()" class="auth-btn">DESBLOQUEAR</button>
+        <button onclick="login()" class="auth-btn">ENTRAR</button>
     </div>
 
     <div class="header-controls">
@@ -60,17 +60,17 @@
 
     <div id="editor-modal">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold; font-size:1.1em;">← Volver</button>
-            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:8px 20px; border-radius:10px; font-weight:bold;">GUARDAR</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:bold; font-size:1.1em;">← Cancelar</button>
+            <button onclick="saveEdit()" style="background:var(--p); color:white; border:none; padding:10px 25px; border-radius:12px; font-weight:bold;">LISTO</button>
         </div>
-        <textarea id="edit-texto"></textarea>
-        <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:15px; font-size:0.9em;">Eliminar permanentemente</button>
+        <textarea id="edit-texto" placeholder="Escribe aquí..."></textarea>
+        <button onclick="deleteNote()" style="color:var(--accent); background:none; border:none; padding:20px; font-size:0.9em; font-weight: 500;">ELIMINAR NOTA</button>
     </div>
 
     <div class="panel">
-        <button onclick="exportarTodo()" style="background:#eee; border:none; padding:12px; border-radius:12px; font-weight:bold;">TXT</button>
+        <button onclick="exportarTodo()" style="background:#f1f5f9; border:none; padding:12px 18px; border-radius:12px; font-weight:bold; color: #475569;">EXPORTAR</button>
         <button id="btn" class="btn-mic">🎤</button>
-        <div id="st" style="font-size:10px; font-weight:bold; width:50px; text-align:right; opacity:0.5;">LISTO</div>
+        <div id="st" style="font-size:10px; font-weight:bold; width:50px; text-align:right; opacity:0.4;">LISTO</div>
     </div>
 
     <script>
@@ -83,25 +83,25 @@
         ];
         
         const PIN_CORRECTO = "1234";
-        let notas = JSON.parse(localStorage.getItem('notas_v7_4')) || [];
+        let notas = JSON.parse(localStorage.getItem('notas_v7_5')) || [];
         let editId = null;
         let isRecording = false;
 
-        // --- MOTOR DE VOZ ANDROID-SPECIFIC ---
+        // --- MOTOR DE VOZ ---
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (Speech) {
             const rec = new Speech();
             rec.lang = 'es-ES';
-            rec.continuous = false; // CAMBIO CLAVE: Evita bucles en Android
+            rec.continuous = false; 
             rec.interimResults = true;
 
             const btn = document.getElementById('btn');
             const preview = document.getElementById('live-preview');
-            let finalNoteText = "";
+            let tempText = "";
 
             btn.onclick = () => {
                 if (isRecording) { rec.stop(); return; }
-                finalNoteText = "";
+                tempText = "";
                 preview.innerText = "...";
                 preview.style.display = "block";
                 btn.classList.add('recording');
@@ -115,20 +115,20 @@
                     current += e.results[i][0].transcript;
                 }
                 preview.innerText = current;
-                finalNoteText = current;
+                tempText = current;
             };
 
             rec.onend = () => {
-                // En móviles, si queremos seguir grabando, el usuario vuelve a pulsar.
-                // Esto garantiza que el texto no se repita.
                 isRecording = false;
                 btn.classList.remove('recording');
                 preview.style.display = "none";
                 
-                if (finalNoteText.trim().length > 2) {
+                if (tempText.trim().length > 1) {
+                    // Limpieza preventiva de caracteres de control
+                    const limpio = tempText.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, "");
                     const nueva = {
                         id: Date.now(),
-                        t: finalNoteText.trim(),
+                        t: limpio,
                         h: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                         f: new Date().toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'})
                     };
@@ -143,11 +143,11 @@
             if(document.getElementById('pin').value === PIN_CORRECTO) {
                 document.getElementById('auth').style.display = 'none';
                 render();
-            } else { alert("PIN incorrecto"); }
+            } else { alert("PIN Incorrecto"); }
         }
 
         function saveAndRender() {
-            localStorage.setItem('notas_v7_4', JSON.stringify(notas));
+            localStorage.setItem('notas_v7_5', JSON.stringify(notas));
             render();
         }
 
@@ -161,15 +161,15 @@
                 acc[n.f].push(n); return acc;
             }, {});
 
-            cont.innerHTML = Object.keys(grupos).map(f => `
+            cont.innerHTML = Object.keys(grupos).length ? Object.keys(grupos).map(f => `
                 <div class="dia">
                     <div class="dia-h">${f}</div>
                     ${grupos[f].map(n => `<div class="nota" onclick="openEdit(${n.id})">
-                        <div style="font-size:10px; color:var(--p); margin-bottom:4px;">${n.h}</div>
+                        <div style="font-size:11px; color:var(--p); font-weight:bold; margin-bottom:5px;">${n.h}</div>
                         ${n.t}
                     </div>`).join('')}
                 </div>
-            `).join('');
+            `).join('') : '<div style="text-align:center; opacity:0.3; margin-top:50px;">No hay notas aún</div>';
         }
 
         function openEdit(id) {
@@ -179,24 +179,44 @@
         }
 
         function saveEdit() {
-            notas.find(n => n.id === editId).t = document.getElementById('edit-texto').value;
+            const idx = notas.findIndex(n => n.id === editId);
+            notas[idx].t = document.getElementById('edit-texto').value.trim();
             closeModal(); saveAndRender();
         }
 
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
         
         function deleteNote() {
-            if(confirm("¿Eliminar?")) {
+            if(confirm("¿Eliminar nota para siempre?")) {
                 notas = notas.filter(n => n.id !== editId);
                 closeModal(); saveAndRender();
             }
         }
 
+        // --- EXPORTACIÓN MEJORADA (FIX CARACTERES) ---
         function exportarTodo() {
-            let txt = notas.map(n => `${n.f} ${n.h}\n${n.t}`).join('\n\n---\n\n');
+            if (notas.length === 0) return alert("No hay notas para exportar");
+            
+            // 1. Construir el texto con separadores claros
+            let txt = "MI DIARIO PERSONAL\r\n" + "=".repeat(20) + "\r\n\r\n";
+            notas.forEach(n => {
+                txt += `FECHA: ${n.f} | HORA: ${n.h}\r\n`;
+                txt += `${n.t}\r\n`;
+                txt += "-".repeat(15) + "\r\n\r\n";
+            });
+
+            // 2. Limpieza final de caracteres extraños invisibles
+            txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
+
+            // 3. Crear Blob con BOM (Byte Order Mark) para UTF-8. 
+            // Esto le dice a Windows/Android que el archivo tiene tildes y eñes.
+            const blob = new Blob(["\ufeff", txt], { type: 'text/plain;charset=utf-8' });
+            
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain'}));
-            a.download = "diario.txt"; a.click();
+            a.href = URL.createObjectURL(blob);
+            a.download = `mis_notas_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
         }
 
         // Reloj y Frases
@@ -206,7 +226,8 @@
         }, 1000);
 
         window.onload = () => {
-            document.getElementById('frase-inicio').innerText = `"${FRASES[Math.floor(Math.random()*FRASES.length)]}"`;
+            const f = FRASES[Math.floor(Math.random()*FRASES.length)];
+            document.getElementById('frase-inicio').innerText = `"${f}"`;
         };
     </script>
 </body>
